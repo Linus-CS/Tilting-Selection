@@ -228,7 +228,13 @@ function startInteraction() {
     start.style.display = "none";
 }
 
-button.addEventListener("click", startInteraction);
+if (!button) {
+    console.error("Button wurde nicht gefunden");
+} else {
+    console.log("Button gefunden");
+    button.addEventListener("click", startInteraction);
+    button.addEventListener("touchstart", startInteraction);
+}
 
 // window.addEventListener("pointermove", (event) => {
 //     moveCursorTo(event.clientX, event.clientY);
