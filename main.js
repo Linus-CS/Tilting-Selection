@@ -1,59 +1,17 @@
-console.log("SCRIPT LOADED");
-
 const articles = [
     {
         title: "Walking and Memory",
-        preview:
-            "Ein Text darüber, wie Bewegung Erinnerungen aktiviert und Orte als Gedächtnisräume funktionieren."
+        preview: "Ein Text darüber, wie Bewegung Erinnerungen aktiviert."
     },
     {
         title: "Walking and Knowledge",
-        preview:
-            "Ein Artikel über Gehen als Methode der Erkenntnisproduktion und räumliches Denken."
+        preview: "Ein Artikel über Gehen als Methode der Erkenntnisproduktion."
     },
     {
         title: "Walking and Creativity",
-        preview:
-            "Ein Essay darüber, wie rhythmische Bewegung kreative Prozesse beeinflusst."
+        preview: "Ein Essay darüber, wie Bewegung kreative Prozesse beeinflusst."
     }
 ];
-
-function placeTargetsRandomly() {
-    const margin = 80;
-    const minDistance = 130;
-
-    const positions = [];
-
-    targets.forEach((target, index) => {
-        let x;
-        let y;
-        let tries = 0;
-        let valid = false;
-
-        while (!valid && tries < 1000) {
-            x = margin + Math.random() * (window.innerWidth - margin * 2);
-            y = margin + Math.random() * (window.innerHeight - margin * 2);
-
-            valid = positions.every((pos) => {
-                const dx = x - pos.x;
-                const dy = y - pos.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                return distance > minDistance;
-            });
-
-            tries++;
-        }
-
-        positions.push({ x, y });
-
-        target.style.left = x + "px";
-        target.style.top = y + "px";
-
-        const label = target.nextElementSibling;
-        label.style.left = x + "px";
-        label.style.top = y + "px";
-    });
-}
 
 const cursor = document.getElementById("cursor");
 const targets = document.querySelectorAll(".target");
@@ -61,82 +19,99 @@ const preview = document.getElementById("preview");
 const previewTitle = document.getElementById("previewTitle");
 const previewText = document.getElementById("previewText");
 const progress = document.getElementById("progress");
-const start = document.getElementById("start");
-const button = document.getElementById("permissionButton");
 
 let x = window.innerWidth / 2;
 let y = window.innerHeight / 2;
 
+let vx = 0;
+let vy = 0;
+
+let tiltEnabled = false;
 let activeTarget = null;
 let dwellStart = null;
 let selected = false;
 
-const dwellTime = 1800;
-const attractionDistance = 170;
+const dwellTime = 1500;
+const previewDistance = 120;
+const targetRadius = 25;
+const cursorRadius = 21;
 
-let vx = 0;
-let vy = 0;
-let tiltEnabled = false;
+function placeTargetsRandomly() {
+    const margin = 90;
+    const minDistance = 160;
+    const positions = [];
+
+    targets.forEach((target) => {
+        let tx, ty, valid;
+
+        do {
+            tx = margin + Math.random() * (window.innerWidth - margin * 2);
+            ty = margin + Math.random() * (window.innerHeight - margin * 2);
+
+            valid = positions.every((pos) => {
+                const dx = tx - pos.x;
+                const dy = ty - pos.y;
+                return Math.sqrt(dx * dx + dy * dy) > minDistance;
+            });
+        } while (!valid);
+
+        positions.push({ x: tx, y: ty });
+
+        target.style.left = tx + "px";
+        target.style.top = ty + "px";
+
+        const label = target.nextElementSibling;
+        label.style.left = tx + "px";
+        label.style.top = ty + "px";
+    });
+}
+
+async function enableTilt() {
+    if (tiltEnabled) return;
+
+    if (
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
+    ) {
+        const permission = await DeviceOrientationEvent.requestPermission();
+
+        if (permission !== "granted") {
+            alert("Bewegungssensor wurde nicht erlaubt.");
+            return;
+        }
+    }
+
+    window.addEventListener("deviceorientation", handleTilt);
+    tiltEnabled = true;
+
+    document.getElementById("hint")?.remove();
+    console.log("Tilt aktiviert");
+}
+
+function handleTilt(event) {
+    const gamma = event.gamma || 0; // links/rechts
+    const beta = event.beta || 0;   // vor/zurück
+
+    vx += gamma * 0.02;
+    vy += beta * 0.02;
+
+    vx *= 0.92;
+    vy *= 0.92;
+}
 
 function updateCursor() {
-    if (tiltEnabled) {
-        x += vx;
-        y += vy;
+    x += vx;
+    y += vy;
 
-        x = Math.max(25, Math.min(window.innerWidth - 25, x));
-        y = Math.max(25, Math.min(window.innerHeight - 25, y));
-    }
+    x = Math.max(cursorRadius, Math.min(window.innerWidth - cursorRadius, x));
+    y = Math.max(cursorRadius, Math.min(window.innerHeight - cursorRadius, y));
 
     cursor.style.left = x + "px";
     cursor.style.top = y + "px";
 
     checkTargets();
+
     requestAnimationFrame(updateCursor);
-}
-
-function handleOrientation(event) {
-    console.log(event.gamma, event.beta);
-    alert(
-        "gamma: " + event.gamma +
-        "\n beta: " + event.beta +
-        "\n alpha: " + event.alpha
-    );
-
-    window.removeEventListener("deviceorientation", handleOrientation);
-}
-
-async function startInteraction() {
-    console.log("BUTTON CLICKED");
-    alert("Start geklickt");
-
-    if (typeof DeviceOrientationEvent === "undefined") {
-        alert("DeviceOrientationEvent existiert nicht.");
-        return;
-    }
-
-    if (typeof DeviceOrientationEvent.requestPermission === "function") {
-        try {
-            const permission = await DeviceOrientationEvent.requestPermission();
-            alert("Permission: " + permission);
-
-            if (permission !== "granted") {
-                alert("Bewegungssensor nicht erlaubt.");
-                return;
-            }
-        } catch (error) {
-            alert("Permission-Fehler: " + error.message);
-            return;
-        }
-    } else {
-        alert("Keine Permission-Abfrage nötig.");
-    }
-
-    tiltEnabled = true;
-    window.addEventListener("deviceorientation", handleOrientation);
-
-    start.style.display = "none";
-
-    alert("Tilt aktiviert");
 }
 
 function checkTargets() {
@@ -144,6 +119,8 @@ function checkTargets() {
     let nearestDistance = Infinity;
 
     targets.forEach((target) => {
+        target.classList.remove("active");
+
         const rect = target.getBoundingClientRect();
         const tx = rect.left + rect.width / 2;
         const ty = rect.top + rect.height / 2;
@@ -152,22 +129,13 @@ function checkTargets() {
         const dy = y - ty;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        target.classList.remove("active");
-
         if (distance < nearestDistance) {
             nearestDistance = distance;
             nearest = target;
         }
     });
 
-    if (nearest && nearestDistance < attractionDistance) {
-        const article = articles[nearest.dataset.id];
-
-        nearest.classList.add("active");
-        preview.classList.add("visible");
-        previewTitle.textContent = article.title;
-        previewText.textContent = article.preview;
-    } else {
+    if (!nearest || nearestDistance > previewDistance) {
         preview.classList.remove("visible");
         progress.style.width = "0%";
         activeTarget = null;
@@ -175,15 +143,16 @@ function checkTargets() {
         return;
     }
 
-    const rect = nearest.getBoundingClientRect();
-    const radius = rect.width / 2;
-    const centerX = rect.left + radius;
-    const centerY = rect.top + radius;
+    const article = articles[nearest.dataset.id];
 
-    const inside =
-        Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2) < radius;
+    nearest.classList.add("active");
+    preview.classList.add("visible");
+    previewTitle.textContent = article.title;
+    previewText.textContent = article.preview;
 
-    if (inside && !selected) {
+    const insideTarget = nearestDistance < targetRadius + cursorRadius * 0.3;
+
+    if (insideTarget && !selected) {
         if (activeTarget !== nearest) {
             activeTarget = nearest;
             dwellStart = performance.now();
@@ -191,6 +160,7 @@ function checkTargets() {
 
         const elapsed = performance.now() - dwellStart;
         const percent = Math.min(elapsed / dwellTime, 1) * 100;
+
         progress.style.width = percent + "%";
 
         if (elapsed >= dwellTime) {
@@ -198,8 +168,8 @@ function checkTargets() {
         }
     } else {
         progress.style.width = "0%";
-        dwellStart = null;
         activeTarget = null;
+        dwellStart = null;
     }
 }
 
@@ -211,39 +181,14 @@ function selectArticle(id) {
     previewText.textContent = "Artikel ausgewählt.";
 
     setTimeout(() => {
-        alert("Ausgewählt: " + articles[id].title);
-
         selected = false;
         targets[id].classList.remove("selected");
         progress.style.width = "0%";
-    }, 300);
+    }, 1200);
 }
 
-function moveCursorTo(clientX, clientY) {
-    x = clientX;
-    y = clientY;
-}
-
-function startInteraction() {
-    start.style.display = "none";
-}
-
-if (!button) {
-    console.error("Button wurde nicht gefunden");
-} else {
-    console.log("Button gefunden");
-    button.addEventListener("click", startInteraction);
-    button.addEventListener("touchstart", startInteraction);
-}
-
-// window.addEventListener("pointermove", (event) => {
-//     moveCursorTo(event.clientX, event.clientY);
-// });
-
-// window.addEventListener("pointerdown", (event) => {
-//     moveCursorTo(event.clientX, event.clientY);
-// });
+document.addEventListener("click", enableTilt);
+document.addEventListener("touchstart", enableTilt, { once: true });
 
 placeTargetsRandomly();
-updateCursor();
 updateCursor();
