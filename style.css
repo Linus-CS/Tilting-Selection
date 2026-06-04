@@ -122,3 +122,53 @@ body {
 #menu.visible {
     opacity: 1;
 }
+
+.wordsOnWalk {
+    position: relative;
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    padding: 4rem 1rem 1rem 1rem;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.wordsOnWalk.measuring {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+}
+
+.word-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+}
+
+.floating-word {
+    font-size: 1rem;
+}
+
+.word-dot {
+    width: 6px;
+    height: 6px;
+    border: 1px solid black;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+#connections {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#connections line {
+    stroke: black;
+    stroke-width: 1;
+}
