@@ -3,10 +3,20 @@
 }
 
 body {
-    margin: 0;
     overflow: hidden;
     height: 100vh;
     color: #000000;
+    display: flex;
+    margin: 0;
+    background: #f4f4f4;
+}
+
+h2 {
+    font-family: "powell", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.4rem;
+    margin: 0;
 }
 
 #hint {
@@ -173,24 +183,12 @@ body {
     stroke-width: 1;
 }
 
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-    background: #f4f4f4;
-}
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
 .compass-wrapper {
     position: relative;
     width: 80vw;
     height: 70vh;
+    align-self: center;
+    margin-top: 1rem;
 }
 
 .compass-oval {
@@ -203,8 +201,8 @@ body {
 
 .dot {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 1.4rem;
+    height: 1.4rem;
     border-radius: 50%;
     background: black;
     transform: translate(-50%, -50%);
@@ -220,4 +218,49 @@ body {
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
+}
+
+.compass-container {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+}
+
+.nav-bar {
+    display: flex;
+    flex-direction: row;
+    padding: 0.7rem 1rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+}
+
+.toc {
+    display: flex;
+    column-gap: 1.5rem;
+}
+
+.category {
+    display: flex;
+    column-gap: 10rem;
+    position: absolute;
+    top: 0.7rem;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.cursor {
+    background-color: black;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 0.7rem;
+    margin-top: 0.2rem;
+}
+
+.target-compass {
+    display: flex;
+    column-gap: 1.5rem;
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    transform: translate(-50%, 0);
 }
