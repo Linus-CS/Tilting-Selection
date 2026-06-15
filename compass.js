@@ -6,11 +6,11 @@ const dots = {
 };
 
 const oval = document.querySelector(".compass-oval");
+const button = document.querySelector("#enable-compass");
 
 let heading = 0;
 
-function updateCompass() {
-
+function placeDot(dot, angleDeg) {
     const width = oval.offsetWidth;
     const height = oval.offsetHeight;
 
@@ -20,61 +20,50 @@ function updateCompass() {
     const rx = width / 2;
     const ry = height / 2;
 
+    const angle = (angleDeg - 90) * Math.PI / 180;
+
+    const x = cx + rx * Math.cos(angle);
+    const y = cy + ry * Math.sin(angle);
+
+    dot.style.left = `${x}px`;
+    dot.style.top = `${y}px`;
+}
+
+function updateCompass() {
     placeDot(dots.north, heading);
     placeDot(dots.east, heading + 90);
     placeDot(dots.south, heading + 180);
     placeDot(dots.west, heading + 270);
-
-    function placeDot(dot, angleDeg) {
-
-        const angle = (angleDeg - 90) * Math.PI / 180;
-
-        const x = cx + rx * Math.cos(angle);
-        const y = cy + ry * Math.sin(angle);
-
-        dot.style.left = `${x}px`;
-        dot.style.top = `${y}px`;
-    }
 }
 
-document
-    .getElementById("enable-compass")
-    .addEventListener("click", async () => {
+async function enableCompass() {
+    if (
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
+    ) {
+        const permission = await DeviceOrientationEvent.requestPermission();
 
-        if (
-            typeof DeviceOrientationEvent !== "undefined" &&
-            typeof DeviceOrientationEvent.requestPermission === "function"
-        ) {
-
-            const permission =
-                await DeviceOrientationEvent.requestPermission();
-
-            if (permission !== "granted") return;
+        if (permission !== "granted") {
+            alert("Kompass-Zugriff wurde nicht erlaubt.");
+            return;
         }
+    }
 
-        window.addEventListener(
-            "deviceorientationabsolute",
-            handleOrientation,
-            true
-        );
+    window.addEventListener("deviceorientation", handleOrientation, true);
 
-        window.addEventListener(
-            "deviceorientation",
-            handleOrientation,
-            true
-        );
-    });
+    button.style.display = "none";
+}
 
 function handleOrientation(event) {
-
-    if (event.webkitCompassHeading) {
-
+    if (event.webkitCompassHeading !== undefined) {
         heading = event.webkitCompassHeading;
-
     } else if (event.alpha !== null) {
-
         heading = 360 - event.alpha;
     }
 
     updateCompass();
 }
+
+button.addEventListener("click", enableCompass);
+
+updateCompass();

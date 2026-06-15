@@ -187,10 +187,16 @@ body {
     min-height: 100vh;
 }
 
-.compass-oval {
+.compass-wrapper {
     position: relative;
     width: 80vw;
     height: 70vh;
+}
+
+.compass-oval {
+    position: relative;
+    width: 100%;
+    height: 100%;
     border: 2px solid black;
     border-radius: 50%;
 }
@@ -200,6 +206,7 @@ body {
     width: 30px;
     height: 30px;
     border-radius: 50%;
+    background: black;
     transform: translate(-50%, -50%);
 }
 
@@ -207,8 +214,10 @@ body {
     background: green;
 }
 
-.dot-east,
-.dot-south,
-.dot-west {
-    background: black;
+#enable-compass {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
 }
