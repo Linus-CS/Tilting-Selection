@@ -38,8 +38,8 @@ let hoverStartTime = null;
 let lockedOption = null;
 let lockHeading = null;
 
-const LOCK_DELAY = 1000;
-const UNLOCK_ANGLE = 20;
+const LOCK_DELAY = 2000;
+const UNLOCK_ANGLE = 45;
 
 function placeDot(option) {
     const width = oval.offsetWidth;
