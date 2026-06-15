@@ -172,3 +172,54 @@ body {
     stroke: black;
     stroke-width: 1;
 }
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    background: #f4f4f4;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.compass-oval {
+    position: relative;
+    width: 80vw;
+    height: 70vh;
+    border: 2px solid black;
+    border-radius: 50%;
+}
+
+.dot {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: black;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.dot-top {
+    top: 0;
+    left: 50%;
+}
+
+.dot-right {
+    top: 50%;
+    left: 100%;
+}
+
+.dot-bottom {
+    top: 100%;
+    left: 50%;
+}
+
+.dot-left {
+    top: 50%;
+    left: 0;
+}
