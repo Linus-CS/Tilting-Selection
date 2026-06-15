@@ -31,7 +31,15 @@ const categoryTitle = document.querySelector(".category-title h2");
 const button = document.querySelector("#enable-compass");
 
 let heading = 0;
-let activeOption = null;
+
+let hoveredOption = null;
+let hoverStartTime = null;
+
+let lockedOption = null;
+let lockHeading = null;
+
+const LOCK_DELAY = 1000;
+const UNLOCK_ANGLE = 20;
 
 function placeDot(option) {
     const width = oval.offsetWidth;
@@ -68,28 +76,84 @@ function isDotInsideTarget(dot) {
     );
 }
 
-function updateActiveOption() {
-    activeOption = null;
+function angleDifference(a, b) {
+    let diff = Math.abs(a - b);
 
+    if (diff > 180) {
+        diff = 360 - diff;
+    }
+
+    return diff;
+}
+
+function getOptionInsideTarget() {
+    return options.find(option => isDotInsideTarget(option.dot)) || null;
+}
+
+function clearDotStates() {
     options.forEach(option => {
         option.dot.classList.remove("is-active");
-
-        if (isDotInsideTarget(option.dot)) {
-            activeOption = option;
-        }
+        option.dot.classList.remove("is-locked");
     });
+}
 
-    if (activeOption) {
-        activeOption.dot.classList.add("is-active");
-        categoryTitle.textContent = activeOption.title;
-    } else {
+function updateLockState() {
+    clearDotStates();
+
+    if (lockedOption) {
+        const diff = angleDifference(heading, lockHeading);
+
+        if (diff > UNLOCK_ANGLE) {
+            lockedOption = null;
+            lockHeading = null;
+            hoverStartTime = null;
+            hoveredOption = null;
+            categoryTitle.textContent = "";
+            return;
+        }
+
+        lockedOption.dot.classList.add("is-locked");
+        categoryTitle.textContent = lockedOption.title;
+        return;
+    }
+
+    const optionInsideTarget = getOptionInsideTarget();
+
+    if (!optionInsideTarget) {
+        hoveredOption = null;
+        hoverStartTime = null;
         categoryTitle.textContent = "";
+        return;
+    }
+
+    optionInsideTarget.dot.classList.add("is-active");
+    categoryTitle.textContent = optionInsideTarget.title;
+
+    if (hoveredOption !== optionInsideTarget) {
+        hoveredOption = optionInsideTarget;
+        hoverStartTime = Date.now();
+        return;
+    }
+
+    const hoverDuration = Date.now() - hoverStartTime;
+
+    if (hoverDuration >= LOCK_DELAY) {
+        lockedOption = optionInsideTarget;
+        lockHeading = heading;
+
+        hoveredOption = null;
+        hoverStartTime = null;
+
+        lockedOption.dot.classList.remove("is-active");
+        lockedOption.dot.classList.add("is-locked");
+
+        categoryTitle.textContent = lockedOption.title;
     }
 }
 
 function updateCompass() {
     options.forEach(placeDot);
-    updateActiveOption();
+    updateLockState();
 }
 
 async function enableCompass() {
