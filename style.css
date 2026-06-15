@@ -183,12 +183,64 @@ h2 {
     stroke-width: 1;
 }
 
+/* Gesamtcontainer */
+
+.compass-container {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* obere Navigation */
+
+.nav-bar {
+    position: relative;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.toc,
+.category,
+.target-compass {
+    display: flex;
+    column-gap: 1.5rem;
+}
+
+.category {
+    position: absolute;
+    top: 0.7rem;
+    left: 50%;
+    transform: translateX(-50%);
+    column-gap: 10rem;
+}
+
+.category-title {
+    position: absolute;
+    top: 0.7rem;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.cursor {
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-top: 0.2rem;
+    border-radius: 50%;
+    background: black;
+}
+
+/* Kompass */
+
 .compass-wrapper {
     position: relative;
     width: 80vw;
     height: 70vh;
-    align-self: center;
-    margin-top: 1rem;
+    margin: 1rem auto 0;
 }
 
 .compass-oval {
@@ -198,6 +250,17 @@ h2 {
     border: 2px solid black;
     border-radius: 50%;
 }
+
+.target-compass {
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Punkte */
 
 .dot {
     position: absolute;
@@ -212,55 +275,12 @@ h2 {
     background: green;
 }
 
+/* Button */
+
 #enable-compass {
     position: fixed;
-    bottom: 24px;
     left: 50%;
+    bottom: 1.5rem;
     transform: translateX(-50%);
-    z-index: 10;
-}
-
-.compass-container {
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-}
-
-.nav-bar {
-    display: flex;
-    flex-direction: row;
-    padding: 0.7rem 1rem;
-    box-sizing: border-box;
-    justify-content: space-between;
-}
-
-.toc {
-    display: flex;
-    column-gap: 1.5rem;
-}
-
-.category {
-    display: flex;
-    column-gap: 10rem;
-    position: absolute;
-    top: 0.7rem;
-    left: 50%;
-    transform: translate(-50%, 0);
-}
-
-.cursor {
-    background-color: black;
-    width: 1.4rem;
-    height: 1.4rem;
-    border-radius: 0.7rem;
-    margin-top: 0.2rem;
-}
-
-.target-compass {
-    display: flex;
-    column-gap: 1.5rem;
-    position: absolute;
-    top: -0.75rem;
-    left: 50%;
-    transform: translate(-50%, 0);
+    z-index: 20;
 }
