@@ -109,6 +109,8 @@ function updateLockState() {
             hoverStartTime = null;
             hoveredOption = null;
             categoryTitle.textContent = "";
+
+            options.forEach(placeDot);
             return;
         }
 
@@ -152,6 +154,11 @@ function updateLockState() {
 }
 
 function updateCompass() {
+    if (lockedOption) {
+        updateLockState();
+        return;
+    }
+
     options.forEach(placeDot);
     updateLockState();
 }
