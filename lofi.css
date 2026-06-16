@@ -1,0 +1,191 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #4f3226;
+    color: #fefff1;
+}
+
+button {
+    border: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    padding: 0.9rem 1.1rem;
+    border-radius: 999px;
+    font: inherit;
+    cursor: pointer;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+#app {
+    min-height: 100vh;
+}
+
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding: 2rem;
+    align-content: center;
+}
+
+.screen.is-active {
+    display: grid;
+}
+
+.screen h1 {
+    font-size: clamp(2.4rem, 12vw, 7rem);
+    line-height: 0.95;
+    max-width: 900px;
+    margin: 0.3em 0;
+}
+
+.screen p,
+.screen article {
+    font-size: clamp(1.1rem, 4vw, 1.7rem);
+    line-height: 1.35;
+    max-width: 720px;
+}
+
+.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem !important;
+    opacity: 0.7;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: none;
+    place-items: center;
+    background: rgba(20, 12, 8, 0.92);
+    padding: 1.2rem;
+}
+
+.overlay.is-visible {
+    display: grid;
+}
+
+.overlay-card {
+    max-width: 560px;
+    background: #fefff1;
+    color: #4f3226;
+    border-radius: 1.2rem;
+    padding: 1.5rem;
+}
+
+.overlay-card h1 {
+    margin-top: 0;
+    font-size: 2rem;
+}
+
+.status-text,
+.hint {
+    opacity: 0.7;
+    font-size: 0.95rem !important;
+}
+
+.meter-display {
+    font-size: clamp(5rem, 30vw, 12rem);
+    line-height: 1;
+    font-weight: 700;
+}
+
+.compass-lofi {
+    width: min(80vw, 420px);
+    height: min(80vw, 420px);
+    position: relative;
+    border: 1px dashed rgba(255, 255, 255, 0.45);
+    border-radius: 50%;
+    margin: 2rem 0;
+}
+
+.compass-lofi button {
+    position: absolute;
+    min-width: 100px;
+}
+
+.compass-lofi button:nth-child(1) {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.compass-lofi button:nth-child(2) {
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+}
+
+.compass-lofi button:nth-child(3) {
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+.compass-lofi button:nth-child(4) {
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.distance-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 1rem;
+    max-width: 420px;
+}
+
+.walking-animation {
+    width: min(80vw, 520px);
+    height: 220px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 1rem;
+    margin: 1.5rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.walking-animation::before {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    left: var(--walk-progress, 0%);
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 0.4s ease;
+}
+
+.article-screen article {
+    background: #fefff1;
+    color: #4f3226;
+    padding: 1.4rem;
+    border-radius: 1rem;
+}
+
+.reader-controls {
+    margin-top: 1rem;
+}
+
+.bottom-progress {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 10;
+    font-size: 0.85rem;
+    opacity: 0.75;
+    pointer-events: none;
+}
