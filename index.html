@@ -7,6 +7,7 @@
     <title>Walking Reader – LoFi</title>
 
     <link rel="stylesheet" href="lofi.css">
+    <link rel="stylesheet" href="https://use.typekit.net/ofh6jca.css">
     <script defer src="content.js"></script>
     <script defer src="app.js"></script>
 </head>
@@ -16,7 +17,7 @@
     <div id="permissionOverlay" class="overlay is-visible">
         <div class="overlay-card">
             <p class="eyebrow">Walking Reader</p>
-            <h1>Diese Website funktioniert nur, wenn du dich bewegst.</h1>
+            <h1>Bereit für eine wwwanderung?</h1>
             <p>
                 Für diesen Reader werden Standort, Bewegungssensoren und Kompassdaten benötigt.
                 Bitte stimme den Berechtigungen zu, damit du die Website verwenden kannst.
@@ -28,13 +29,31 @@
 
     <main id="app">
 
-        <section data-screen="cover" class="screen">
-            <p class="eyebrow">Cover</p>
-            <h1>FOOTNOTES</h1>
-            <p>Gehe 50 Meter, um den Reader zu öffnen.</p>
+        <div class="nav-bar">
+            <div class="toc">
+                <h2>(</h2>
+                <h2>)</h2>
+            </div>
+            <div class="category">
+                <h2>(</h2>
+                <h2>)</h2>
+            </div>
+            <div class="category-title">
+                <h2></h2>
+            </div>
+            <div class="cursor"></div>
+        </div>
 
-            <div class="meter-display">
-                <span id="coverMeters">50</span> m
+        <section data-screen="cover" class="screen">
+            <div class="cover-title">
+                <p class="eyebrow">Cover</p>
+                <h1>FOOTNOTES</h1>
+            </div>
+            <div class="cover-meter">
+                <div class="meter-display">
+                    <span id="coverMeters">50</span> m
+                </div>
+                <p>Meter, bis es losgeht</p>
             </div>
 
             <button data-action="simulate-walk">+ 10m gehen</button>
@@ -47,16 +66,43 @@
             <button data-action="next" data-next="calibration-compass">Start</button>
         </section>
 
-        <section data-screen="calibration-compass" class="screen">
+        <section data-screen="calibration-compass" class="screen compass-screen">
             <p class="eyebrow">Kalibrierung 1/3</p>
             <h1>Kompassinteraktion</h1>
-            <p>Richte dein Handy in eine Himmelsrichtung, um eine Option auszuwählen.</p>
+            <p>Richte dein Handy so aus, dass ein Punkt oben einrastet.</p>
 
-            <div class="compass-lofi">
-                <button data-action="compass-select">Norden</button>
-                <button data-action="compass-select">Osten</button>
-                <button data-action="compass-select">Süden</button>
-                <button data-action="compass-select">Westen</button>
+            <div class="compass-container" data-compass="calibration">
+                <div class="nav-bar">
+                    <div class="toc">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="category">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="category-title">
+                        <h2></h2>
+                    </div>
+
+                    <div class="cursor"></div>
+                </div>
+
+                <div class="compass-wrapper">
+                    <div class="target-compass">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="compass-oval">
+                        <div class="dot dot-north"></div>
+                        <div class="dot dot-east"></div>
+                        <div class="dot dot-south"></div>
+                        <div class="dot dot-west"></div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -74,15 +120,42 @@
             <button data-action="next" data-next="distance-select">Schütteln simulieren</button>
         </section>
 
-        <section data-screen="distance-select" class="screen">
+        <section data-screen="distance-select" class="screen compass-screen">
             <p class="eyebrow">Distanz wählen</p>
             <h1>Wie weit möchtest du zwischen Artikeln gehen?</h1>
 
-            <div class="distance-grid">
-                <button data-action="set-distance" data-distance="100">100 m</button>
-                <button data-action="set-distance" data-distance="200">200 m</button>
-                <button data-action="set-distance" data-distance="500">500 m</button>
-                <button data-action="set-distance" data-distance="1000">1 km</button>
+            <div class="compass-container" data-compass="distance">
+                <div class="nav-bar">
+                    <div class="toc">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="category">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="category-title">
+                        <h2></h2>
+                    </div>
+
+                    <div class="cursor"></div>
+                </div>
+
+                <div class="compass-wrapper">
+                    <div class="target-compass">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="compass-oval">
+                        <div class="dot dot-north"></div>
+                        <div class="dot dot-east"></div>
+                        <div class="dot dot-south"></div>
+                        <div class="dot dot-west"></div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -108,10 +181,43 @@
             </div>
         </section>
 
-        <section data-screen="main-toc" class="screen">
+        <section data-screen="main-toc" class="screen compass-screen">
             <p class="eyebrow">Inhaltsverzeichnis</p>
             <h1>Wähle eine Oberkategorie.</h1>
-            <div id="mainTocOptions" class="compass-lofi"></div>
+
+            <div class="compass-container" data-compass="main-toc">
+                <div class="nav-bar">
+                    <div class="toc">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="category">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="category-title">
+                        <h2></h2>
+                    </div>
+
+                    <div class="cursor"></div>
+                </div>
+
+                <div class="compass-wrapper">
+                    <div class="target-compass">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="compass-oval">
+                        <div class="dot dot-north"></div>
+                        <div class="dot dot-east"></div>
+                        <div class="dot dot-south"></div>
+                        <div class="dot dot-west"></div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section data-screen="category-intro" class="screen">
@@ -121,10 +227,43 @@
             <button data-action="open-category-compass">Zur Artikelübersicht</button>
         </section>
 
-        <section data-screen="category-compass" class="screen">
+        <section data-screen="category-compass" class="screen compass-screen">
             <p class="eyebrow">Artikelübersicht</p>
             <h1 id="categoryCompassTitle"></h1>
-            <div id="categoryArticleOptions" class="compass-lofi"></div>
+
+            <div class="compass-container" data-compass="category-articles">
+                <div class="nav-bar">
+                    <div class="toc">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="category">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="category-title">
+                        <h2></h2>
+                    </div>
+
+                    <div class="cursor"></div>
+                </div>
+
+                <div class="compass-wrapper">
+                    <div class="target-compass">
+                        <h2>(</h2>
+                        <h2>)</h2>
+                    </div>
+
+                    <div class="compass-oval">
+                        <div class="dot dot-north"></div>
+                        <div class="dot dot-east"></div>
+                        <div class="dot dot-south"></div>
+                        <div class="dot dot-west"></div>
+                    </div>
+                </div>
+            </div>
         </section>
 
     </main>

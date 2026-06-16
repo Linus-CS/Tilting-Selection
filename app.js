@@ -40,6 +40,96 @@ function showScreen(name) {
     });
 
     globalStatus.textContent = `Aktueller Screen: ${name}`;
+
+    if (name === "calibration-compass") {
+        startCompassInteraction({
+            options: [
+                { key: "north", title: "Norden" },
+                { key: "east", title: "Osten" },
+                { key: "south", title: "Süden" },
+                { key: "west", title: "Westen" }
+            ],
+            onLock: () => {
+                setTimeout(() => {
+                    showScreen("calibration-page-turn");
+                }, 800);
+            }
+        });
+    }
+
+    if (name === "distance-select") {
+        startCompassInteraction({
+            options: [
+                { key: "north", title: "100 m", value: 100 },
+                { key: "east", title: "200 m", value: 200 },
+                { key: "south", title: "500 m", value: 500 },
+                { key: "west", title: "1 km", value: 1000 }
+            ],
+            onLock: (option) => {
+                state.selectedDistance = option.value;
+
+                setTimeout(() => {
+                    startWalkGoal(50, () => {
+                        renderArticle(READER_CONTENT.introArticle, {
+                            eyebrow: "Einleitung"
+                        });
+                    }, "Gehe 50m bis zur ersten Seite.");
+                }, 800);
+            }
+        });
+    }
+
+    if (name === "main-toc") {
+        startCompassInteraction({
+            options: READER_CONTENT.categories.slice(0, 4).map((category, index) => {
+                const keys = ["north", "east", "south", "west"];
+
+                return {
+                    key: keys[index],
+                    title: category.title,
+                    value: category.id
+                };
+            }),
+            onLock: (option) => {
+                setTimeout(() => {
+                    selectCategory(option.value);
+                }, 800);
+            }
+        });
+    }
+
+    if (name === "category-compass") {
+        const category = findCategory(state.currentCategoryId);
+        if (!category) return;
+
+        const keys = ["north", "east", "south"];
+
+        const articleOptions = category.articles.slice(0, 3).map((article, index) => ({
+            key: keys[index],
+            title: article.title,
+            value: article.id
+        }));
+
+        articleOptions.push({
+            key: "west",
+            title: "Zurück",
+            value: "back"
+        });
+
+        startCompassInteraction({
+            options: articleOptions,
+            onLock: (option) => {
+                setTimeout(() => {
+                    if (option.value === "back") {
+                        renderMainToc();
+                        showScreen("main-toc");
+                    } else {
+                        selectArticle(option.value);
+                    }
+                }, 800);
+            }
+        });
+    }
 }
 
 function startWalkGoal(meters, callback, label = "Gehe weiter.") {
@@ -193,6 +283,217 @@ function findCategory(categoryId) {
     return READER_CONTENT.categories.find((category) => category.id === categoryId);
 }
 
+let compassHeading = 0;
+let compassActiveConfig = null;
+let compassHoveredOption = null;
+let compassHoverStartTime = null;
+let compassLockedOption = null;
+let compassLockHeading = null;
+
+const COMPASS_LOCK_DELAY = 2000;
+const COMPASS_UNLOCK_ANGLE = 45;
+
+const compassAngles = {
+    north: 0,
+    east: 90,
+    south: 180,
+    west: 270
+};
+
+function startCompassInteraction(config) {
+    compassActiveConfig = config;
+    compassHoveredOption = null;
+    compassHoverStartTime = null;
+    compassLockedOption = null;
+    compassLockHeading = null;
+
+    updateCompass();
+}
+
+function getActiveCompassElements() {
+    const container = document.querySelector(
+        `[data-screen="${state.screen}"] .compass-container`
+    );
+
+    if (!container) return null;
+
+    return {
+        container,
+        oval: container.querySelector(".compass-oval"),
+        target: container.querySelector(".target-compass"),
+        title: container.querySelector(".category-title h2"),
+        dots: {
+            north: container.querySelector(".dot-north"),
+            east: container.querySelector(".dot-east"),
+            south: container.querySelector(".dot-south"),
+            west: container.querySelector(".dot-west")
+        }
+    };
+}
+
+function getCompassOptions() {
+    if (!compassActiveConfig) return [];
+
+    return compassActiveConfig.options.map((option) => ({
+        ...option,
+        angle: compassAngles[option.key]
+    }));
+}
+
+function placeCompassDot(option, elements) {
+    const dot = elements.dots[option.key];
+    if (!dot) return;
+
+    const width = elements.oval.offsetWidth;
+    const height = elements.oval.offsetHeight;
+
+    const cx = width / 2;
+    const cy = height / 2;
+
+    const rx = width / 2;
+    const ry = height / 2;
+
+    const angleDeg = compassHeading + option.angle;
+    const angle = (angleDeg - 90) * Math.PI / 180;
+
+    const x = cx + rx * Math.cos(angle);
+    const y = cy + ry * Math.sin(angle);
+
+    dot.style.display = "block";
+    dot.style.left = `${x}px`;
+    dot.style.top = `${y}px`;
+}
+
+function isCompassDotInsideTarget(dot, target) {
+    const dotRect = dot.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+
+    const dotCenterX = dotRect.left + dotRect.width / 2;
+    const dotCenterY = dotRect.top + dotRect.height / 2;
+
+    return (
+        dotCenterX >= targetRect.left &&
+        dotCenterX <= targetRect.right &&
+        dotCenterY >= targetRect.top &&
+        dotCenterY <= targetRect.bottom
+    );
+}
+
+function compassAngleDifference(a, b) {
+    let diff = Math.abs(a - b);
+
+    if (diff > 180) {
+        diff = 360 - diff;
+    }
+
+    return diff;
+}
+
+function clearCompassDotStates(elements) {
+    Object.values(elements.dots).forEach((dot) => {
+        dot.classList.remove("is-active");
+        dot.classList.remove("is-locked");
+        dot.style.display = "none";
+    });
+}
+
+function getCompassOptionInsideTarget(options, elements) {
+    return options.find((option) => {
+        const dot = elements.dots[option.key];
+        return dot && isCompassDotInsideTarget(dot, elements.target);
+    }) || null;
+}
+
+function updateCompassLockState(options, elements) {
+    clearCompassDotStates(elements);
+
+    options.forEach((option) => {
+        const dot = elements.dots[option.key];
+        if (dot) dot.style.display = "block";
+    });
+
+    if (compassLockedOption) {
+        const diff = compassAngleDifference(compassHeading, compassLockHeading);
+
+        if (diff > COMPASS_UNLOCK_ANGLE) {
+            compassLockedOption = null;
+            compassLockHeading = null;
+            compassHoveredOption = null;
+            compassHoverStartTime = null;
+            elements.title.textContent = "";
+
+            options.forEach((option) => placeCompassDot(option, elements));
+            return;
+        }
+
+        elements.dots[compassLockedOption.key].classList.add("is-locked");
+        elements.title.textContent = compassLockedOption.title;
+        return;
+    }
+
+    const optionInsideTarget = getCompassOptionInsideTarget(options, elements);
+
+    if (!optionInsideTarget) {
+        compassHoveredOption = null;
+        compassHoverStartTime = null;
+        elements.title.textContent = "";
+        return;
+    }
+
+    elements.dots[optionInsideTarget.key].classList.add("is-active");
+    elements.title.textContent = optionInsideTarget.title;
+
+    if (compassHoveredOption !== optionInsideTarget) {
+        compassHoveredOption = optionInsideTarget;
+        compassHoverStartTime = Date.now();
+        return;
+    }
+
+    const hoverDuration = Date.now() - compassHoverStartTime;
+
+    if (hoverDuration >= COMPASS_LOCK_DELAY) {
+        compassLockedOption = optionInsideTarget;
+        compassLockHeading = compassHeading;
+
+        compassHoveredOption = null;
+        compassHoverStartTime = null;
+
+        elements.dots[compassLockedOption.key].classList.remove("is-active");
+        elements.dots[compassLockedOption.key].classList.add("is-locked");
+
+        elements.title.textContent = compassLockedOption.title;
+
+        if (typeof compassActiveConfig.onLock === "function") {
+            compassActiveConfig.onLock(compassLockedOption);
+        }
+    }
+}
+
+function updateCompass() {
+    const elements = getActiveCompassElements();
+    if (!elements || !compassActiveConfig) return;
+
+    const options = getCompassOptions();
+
+    if (!compassLockedOption) {
+        options.forEach((option) => placeCompassDot(option, elements));
+    }
+
+    updateCompassLockState(options, elements);
+}
+
+function handleOrientation(event) {
+    if (event.webkitCompassHeading !== undefined) {
+        compassHeading = event.webkitCompassHeading;
+    } else if (event.alpha !== null) {
+        compassHeading = 360 - event.alpha;
+    }
+
+    updateCompass();
+}
+
+window.addEventListener("deviceorientation", handleOrientation, true);
+
 async function requestPermissions() {
     permissionStatus.textContent = "Berechtigungen werden angefragt …";
 
@@ -284,18 +585,6 @@ function handleClick(event) {
 
     if (action === "simulate-walk") {
         simulateWalk(10);
-    }
-
-    if (action === "compass-select") {
-        showScreen("calibration-page-turn");
-    }
-
-    if (action === "set-distance") {
-        state.selectedDistance = Number(button.dataset.distance);
-
-        startWalkGoal(50, () => {
-            renderArticle(READER_CONTENT.introArticle, { eyebrow: "Einleitung" });
-        }, "Gehe 50m bis zur ersten Seite.");
     }
 
     if (action === "page-turn") {
