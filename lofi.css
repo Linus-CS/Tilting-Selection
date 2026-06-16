@@ -212,39 +212,24 @@ button:hover {
 .compass-screen.is-active {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
 
     height: 100dvh;
-    padding: 4.5rem 1rem 0;
+    padding: 0;
 }
 
 .compass-screen>.eyebrow {
     position: fixed;
     left: 50%;
     bottom: 1rem;
-    transform: translateX(-50%);
+    z-index: 8;
 
     padding: 0;
-    z-index: 8;
+    transform: translateX(-50%);
 }
 
-.compass-screen>h1,
-.compass-screen>p {
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
-.compass-container {
-    position: relative;
-
-    width: 85vw;
-    height: 60vh;
-
-    margin: 0 auto;
-}
-
-/* Compass Navigation oben */
+/* globale Nav-Bar */
 
 .nav-bar {
     position: fixed;
@@ -252,13 +237,13 @@ button:hover {
     left: 0;
     z-index: 10;
 
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-
     width: 100%;
     height: 3.5rem;
     padding: 0.7rem 1rem;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .toc,
@@ -272,7 +257,6 @@ button:hover {
     position: absolute;
     top: 0.7rem;
     left: 50%;
-
     column-gap: 12rem;
     transform: translateX(-50%);
 }
@@ -281,7 +265,6 @@ button:hover {
     position: absolute;
     top: 0.7rem;
     left: 50%;
-
     transform: translateX(-50%);
     pointer-events: none;
 }
@@ -290,12 +273,30 @@ button:hover {
     width: 1.4rem;
     height: 1.4rem;
     margin-top: 0.2rem;
-
     border-radius: 50%;
     background: currentColor;
 }
 
-/* Compass Form */
+/* alter Compass-Aufbau */
+
+.compass-container {
+    width: 100vw;
+    min-height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+
+    padding-top: calc(env(safe-area-inset-top) + 3.5rem);
+}
+
+.compass-wrapper {
+    position: relative;
+
+    width: 80vw;
+    height: 70vh;
+
+    margin: 1rem auto 0;
+}
 
 .compass-oval {
     position: relative;
@@ -309,7 +310,7 @@ button:hover {
 
 .target-compass {
     position: absolute;
-    top: 0.35rem;
+    top: -0.75rem;
     left: 50%;
     z-index: 5;
 
@@ -327,35 +328,7 @@ button:hover {
     transform: translate(-50%, -50%);
 }
 
-/* Compass Dots */
-
-.dot {
-    position: absolute;
-
-    width: 1.4rem;
-    height: 1.4rem;
-
-    border-radius: 50%;
-    background: currentColor;
-
-    transform: translate(-50%, -50%);
-}
-
-.dot-north {
-    background: limegreen;
-}
-
-.dot.is-active {
-    outline: 0.4rem solid rgba(255, 255, 255, 0.35);
-}
-
-.dot.is-locked {
-    width: 2rem;
-    height: 2rem;
-    background: #fefff1;
-}
-
-/* Compass Dots */
+/* Punkte */
 
 .dot {
     position: absolute;
