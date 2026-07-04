@@ -173,29 +173,13 @@ function updateMetersUI() {
     const coverScreen = document.querySelector('[data-screen="cover"]');
 
     if (coverScreen && state.screen === "cover") {
-        const meters = state.walkedMeters;
+        const progress = state.walkGoal
+            ? state.walkedMeters / state.walkGoal
+            : 0;
 
-        let angle = 180;
-        let brownStop = 100;
-        let blueStop = 100;
+        const blueStart = 100 - progress * 100;
 
-        if (meters <= 40) {
-            const t = meters / 40;
-
-            angle = 180;
-            brownStop = 100 - t * 90;
-            blueStop = 100;
-        } else {
-            const t = (meters - 40) / 10;
-
-            angle = 180 - t * 180;
-            brownStop = 10 + t * 90;
-            blueStop = 100;
-        }
-
-        coverScreen.style.setProperty("--gradient-angle", `${angle}deg`);
-        coverScreen.style.setProperty("--brown-stop", `${brownStop}%`);
-        coverScreen.style.setProperty("--blue-stop", `${blueStop}%`);
+        coverScreen.style.setProperty("--blue-start", `${blueStart}%`);
     }
 }
 

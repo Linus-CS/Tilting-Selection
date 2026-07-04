@@ -215,13 +215,13 @@ button:hover {
 [data-screen="cover"] {
     overflow: hidden;
 
-    --gradient-angle: 180deg;
-    --brown-stop: 100%;
-    --blue-stop: 100%;
+    --blue-start: 100%;
 
-    background: linear-gradient(var(--gradient-angle),
-            #663024 var(--brown-stop),
-            #8aa0dd var(--blue-stop));
+    background: linear-gradient(180deg,
+            #663024 0%,
+            #663024 var(--blue-start),
+            #8aa0dd var(--blue-start),
+            #8aa0dd 100%);
 }
 
 .cover-title {
