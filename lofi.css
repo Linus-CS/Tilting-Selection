@@ -48,6 +48,17 @@ h2 {
     text-transform: uppercase;
 }
 
+h3 {
+    color: #663024;
+    text-align: center;
+    font-family: "powell", sans-serif;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-transform: uppercase;
+}
+
 .screen p,
 .screen article {
     margin: 0;
@@ -357,9 +368,19 @@ button:hover {
     transform: translate(-50%, -50%);
 }
 
+.compass-screen.is-active {
+    display: flex;
+    flex-direction: column;
+
+    height: 100dvh;
+    overflow: hidden;
+}
+
 .compass-container {
-    width: 100vw;
-    min-height: 100dvh;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+
     padding-top: calc(env(safe-area-inset-top) + 3.5rem);
 
     display: flex;
@@ -370,7 +391,7 @@ button:hover {
     position: relative;
 
     width: 80vw;
-    height: 70vh;
+    height: 80vh;
     margin: 1rem auto 0;
 }
 
@@ -386,7 +407,7 @@ button:hover {
 
 .target-compass {
     position: absolute;
-    top: -0.75rem;
+    top: -0.6rem;
     left: 50%;
     z-index: 5;
 
@@ -419,11 +440,7 @@ button:hover {
 }
 
 .dot-north {
-    background: limegreen;
-}
-
-.dot.is-active {
-    outline: 0.4rem solid rgba(255, 255, 255, 0.35);
+    background: #8AA0DD;
 }
 
 .dot.is-locked {
@@ -431,4 +448,13 @@ button:hover {
     height: 2rem;
 
     background: #fefff1;
+}
+
+
+[data-screen="calibration-intro"] {
+    background-color: #8aa0dd;
+}
+
+[data-screen="distance-select"] {
+    background: linear-gradient(180deg, #663024 0%, #8AA0DD 39.9%);
 }

@@ -72,7 +72,7 @@
                 <span id="coverMeters">50</span>m
             </div>
 
-            <!-- <button data-action="simulate-walk">+ 10m gehen</button> -->
+            <button data-action="simulate-walk">+ 10m gehen</button>
         </section>
 
         <section data-screen="calibration-intro" class="screen">
@@ -127,11 +127,9 @@
         </section>
 
         <section data-screen="distance-select" class="screen compass-screen">
-            <p class="eyebrow">Distanz wählen</p>
 
             <div class="compass-container" data-compass="distance">
                 <div class="compass-wrapper">
-                    <h1 class="compass-question">Wie weit möchtest du zwischen den Artikeln gehen?</h1>
 
                     <div class="target-compass">
                         <h2>(</h2>
@@ -144,11 +142,14 @@
                         <div class="dot dot-south"></div>
                         <div class="dot dot-west"></div>
                     </div>
+
+                    <h3 class="compass-question">Wie weit möchtest du zwischen den Artikeln gehen?</h3>
+
                 </div>
             </div>
-            <button data-action="next" data-next="walk-transition">
+            <!-- <button data-action="next" data-next="walk-transition">
                 laufpause
-            </button>
+            </button> -->
         </section>
 
         <section data-screen="walk-transition" class="screen">

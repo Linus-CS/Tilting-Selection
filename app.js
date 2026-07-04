@@ -390,8 +390,10 @@ function placeCompassDot(option, elements) {
     const cx = width / 2;
     const cy = height / 2;
 
-    const rx = width / 2;
-    const ry = height / 2;
+    const borderWidth = 2;
+
+    const rx = width / 2 - borderWidth / 2;
+    const ry = height / 2 - borderWidth / 2;
 
     const angleDeg = compassHeading + option.angle;
     const angle = (angleDeg - 90) * Math.PI / 180;
@@ -505,11 +507,6 @@ function getCompassOptionInsideTarget(options, elements) {
 function updateCompassLockState(options, elements) {
     clearCompassDotStates(elements);
 
-    options.forEach((option) => {
-        const dot = elements.dots[option.key];
-        if (dot) dot.style.display = "block";
-    });
-
     if (compassLockedOption) {
         const diff = compassAngleDifference(compassHeading, compassLockHeading);
 
@@ -521,53 +518,46 @@ function updateCompassLockState(options, elements) {
             compassConfirmedOption = null;
 
             localStorage.removeItem("compassConfirmStartLocation");
-
             setGlobalCompassTitle("");
 
-            if (state.screen === "calibration-compass") {
-                setCompassInstruction("Drehe dich so, dass ein Punkt oben einrastet.");
-            }
+            options.forEach((option) => {
+                placeCompassDot(option, elements);
+                elements.dots[option.key].style.display = "block";
+            });
 
-            options.forEach((option) => placeCompassDot(option, elements));
             return;
         }
 
-        elements.dots[compassLockedOption.key].classList.add("is-locked");
-        setGlobalCompassTitle(compassLockedOption.title);
+        const lockedDot = elements.dots[compassLockedOption.key];
 
-        if (state.screen === "calibration-compass") {
-            setCompassInstruction(
-                "Diese Option ist jetzt ausgewählt – gehe 10m geradeaus, um deine Auswahl zu bestätigen."
-            );
+        if (lockedDot) {
+            lockedDot.style.display = "block";
+            lockedDot.classList.add("is-locked");
         }
+
+        setGlobalCompassTitle(compassLockedOption.title);
 
         checkCompassConfirmationByDistance();
         return;
     }
+
+    options.forEach((option) => {
+        placeCompassDot(option, elements);
+        elements.dots[option.key].style.display = "block";
+    });
 
     const optionInsideTarget = getCompassOptionInsideTarget(options, elements);
 
     if (!optionInsideTarget) {
         compassHoveredOption = null;
         compassHoverStartTime = null;
-
         setGlobalCompassTitle("");
-
-        if (state.screen === "calibration-compass") {
-            setCompassInstruction("Drehe dich so, dass ein Punkt oben einrastet.");
-        }
-
         return;
     }
 
-    elements.dots[optionInsideTarget.key].classList.add("is-active");
+    const activeDot = elements.dots[optionInsideTarget.key];
+    activeDot.classList.add("is-active");
     setGlobalCompassTitle(optionInsideTarget.title);
-
-    if (state.screen === "calibration-compass") {
-        setCompassInstruction(
-            "Diese Option ist jetzt ausgewählt – gehe 10m geradeaus, um deine Auswahl zu bestätigen."
-        );
-    }
 
     if (compassHoveredOption !== optionInsideTarget) {
         compassHoveredOption = optionInsideTarget;
@@ -584,11 +574,10 @@ function updateCompassLockState(options, elements) {
         compassHoveredOption = null;
         compassHoverStartTime = null;
 
-        elements.dots[compassLockedOption.key].classList.remove("is-active");
-        elements.dots[compassLockedOption.key].classList.add("is-locked");
+        activeDot.classList.remove("is-active");
+        activeDot.classList.add("is-locked");
 
         setGlobalCompassTitle(compassLockedOption.title);
-
         saveCompassConfirmStartLocation();
     }
 }
@@ -598,10 +587,6 @@ function updateCompass() {
     if (!elements || !compassActiveConfig) return;
 
     const options = getCompassOptions();
-
-    if (!compassLockedOption) {
-        options.forEach((option) => placeCompassDot(option, elements));
-    }
 
     updateCompassLockState(options, elements);
 }
