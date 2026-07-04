@@ -8,8 +8,20 @@
 
     <link rel="stylesheet" href="lofi.css">
     <link rel="stylesheet" href="https://use.typekit.net/ofh6jca.css">
+    <script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js"></script>
+
     <script defer src="content.js"></script>
     <script defer src="app.js"></script>
+
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- wichtig für iOS / Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Footnotes">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
 </head>
 
 <body>
@@ -46,14 +58,18 @@
 
         <section data-screen="cover" class="screen">
             <div class="cover-title">
-                <p class="eyebrow">Cover</p>
-                <h1>FOOTNOTES</h1>
+                <h1>FOOT</h1>
+                <h1>NOTES</h1>
             </div>
-            <div class="cover-meter">
-                <div class="meter-display">
-                    <span id="coverMeters">50</span> m
-                </div>
-                <p>Meter, bis es losgeht</p>
+
+            <!-- <dotlottie-wc class="walk-animation" src="./animations/trajectory_transparent_white.lottie" autoplay
+                loop></dotlottie-wc> -->
+
+            <div class="walk-animation">
+                <img src="/assets/platzhalter-coveranimation.svg" alt="">
+            </div>
+            <div class="meter-display">
+                <span id="coverMeters">50</span>m
             </div>
 
             <button data-action="simulate-walk">+ 10m gehen</button>
@@ -207,10 +223,6 @@
         </section>
 
     </main>
-
-    <div class="bottom-progress">
-        <span id="globalStatus">LoFi-Prototyp</span>
-    </div>
 
 </body>
 

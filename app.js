@@ -41,8 +41,6 @@ function showScreen(name) {
         screen.classList.toggle("is-active", screen.dataset.screen === name);
     });
 
-    globalStatus.textContent = `Aktueller Screen: ${name}`;
-
     setGlobalCompassTitle("");
 
     if (name === "calibration-compass") {
@@ -168,6 +166,51 @@ function updateMetersUI() {
     transitionMeters.textContent = remaining;
 
     walkingAnimation.style.setProperty("--walk-progress", `${progress * 100}%`);
+
+    const coverScreen = document.querySelector('[data-screen="cover"]');
+
+    if (coverScreen && state.screen === "cover") {
+
+        let background;
+
+        if (state.walkedMeters <= 40) {
+
+            // 100% -> 10%
+            const t = state.walkedMeters / 40;
+            const stop = 100 - t * 90;
+
+            background = `linear-gradient(
+            180deg,
+            #663024 ${stop}%,
+            #8aa0dd 100%
+        )`;
+
+        } else {
+
+            // 40m -> 50m
+            const t = (state.walkedMeters - 40) / 10;
+
+            if (t < 1) {
+                const blueStop = 10 + t * 90;
+
+                background = `linear-gradient(
+                180deg,
+                #8aa0dd ${blueStop}%,
+                #663024 100%
+            )`;
+            } else {
+
+                background = `linear-gradient(
+                180deg,
+                #8aa0dd 100%,
+                #663024 100%
+            )`;
+
+            }
+        }
+
+        coverScreen.style.background = background;
+    }
 }
 
 function renderArticle(article, options = {}) {
