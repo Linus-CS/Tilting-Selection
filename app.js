@@ -13,6 +13,9 @@ const state = {
     walkStartLocation: null
 };
 
+let displayedMeters = 0;
+const coverScreen = document.querySelector('[data-screen="cover"]');
+
 const screens = document.querySelectorAll("[data-screen]");
 const permissionOverlay = document.querySelector("#permissionOverlay");
 const permissionButton = document.querySelector("#permissionButton");
@@ -170,17 +173,20 @@ function updateMetersUI() {
 
     walkingAnimation.style.setProperty("--walk-progress", `${progress * 100}%`);
 
-    const coverScreen = document.querySelector('[data-screen="cover"]');
+}
 
-    if (coverScreen && state.screen === "cover") {
-        const progress = state.walkGoal
-            ? state.walkedMeters / state.walkGoal
-            : 0;
+function animateWalk() {
 
-        const blueStart = 100 - progress * 100;
+    displayedMeters += (state.walkedMeters - displayedMeters) * 0.08;
 
-        coverScreen.style.setProperty("--blue-start", `${blueStart}%`);
+    if (coverScreen && state.walkGoal) {
+        const progress = displayedMeters / state.walkGoal;
+        const split = 100 - progress * 100;
+
+        coverScreen.style.setProperty("--split", `${split}%`);
     }
+
+    requestAnimationFrame(animateWalk);
 }
 
 function renderArticle(article, options = {}) {
@@ -850,3 +856,5 @@ document.addEventListener("click", handleClick);
 showScreen("cover");
 
 permissionOverlay?.classList.add("is-visible");
+
+animateWalk();

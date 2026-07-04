@@ -213,14 +213,13 @@ button:hover {
 /* Cover */
 
 [data-screen="cover"] {
-    overflow: hidden;
-
-    --blue-start: 100%;
+    --split: 100%;
 
     background: linear-gradient(180deg,
             #663024 0%,
-            #663024 var(--blue-start),
-            #8aa0dd var(--blue-start),
+            #663024 calc(var(--split) - 10%),
+            #6f5c73 var(--split),
+            #8aa0dd calc(var(--split) + 10%),
             #8aa0dd 100%);
 }
 
