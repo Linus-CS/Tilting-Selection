@@ -7,7 +7,10 @@ const state = {
 
     walkGoal: null,
     walkedMeters: 0,
-    afterWalk: null
+    afterWalk: null,
+
+    watchId: null,
+    walkStartLocation: null
 };
 
 const screens = document.querySelectorAll("[data-screen]");
@@ -170,46 +173,29 @@ function updateMetersUI() {
     const coverScreen = document.querySelector('[data-screen="cover"]');
 
     if (coverScreen && state.screen === "cover") {
+        const meters = state.walkedMeters;
 
-        let background;
+        let angle = 180;
+        let brownStop = 100;
+        let blueStop = 100;
 
-        if (state.walkedMeters <= 40) {
+        if (meters <= 40) {
+            const t = meters / 40;
 
-            // 100% -> 10%
-            const t = state.walkedMeters / 40;
-            const stop = 100 - t * 90;
-
-            background = `linear-gradient(
-            180deg,
-            #663024 ${stop}%,
-            #8aa0dd 100%
-        )`;
-
+            angle = 180;
+            brownStop = 100 - t * 90;
+            blueStop = 100;
         } else {
+            const t = (meters - 40) / 10;
 
-            // 40m -> 50m
-            const t = (state.walkedMeters - 40) / 10;
-
-            if (t < 1) {
-                const blueStop = 10 + t * 90;
-
-                background = `linear-gradient(
-                180deg,
-                #8aa0dd ${blueStop}%,
-                #663024 100%
-            )`;
-            } else {
-
-                background = `linear-gradient(
-                180deg,
-                #8aa0dd 100%,
-                #663024 100%
-            )`;
-
-            }
+            angle = 180 - t * 180;
+            brownStop = 10 + t * 90;
+            blueStop = 100;
         }
 
-        coverScreen.style.background = background;
+        coverScreen.style.setProperty("--gradient-angle", `${angle}deg`);
+        coverScreen.style.setProperty("--brown-stop", `${brownStop}%`);
+        coverScreen.style.setProperty("--blue-stop", `${blueStop}%`);
     }
 }
 
@@ -768,8 +754,69 @@ function startCoverWalk() {
     state.walkGoal = 50;
     state.walkedMeters = 0;
     state.afterWalk = () => showScreen("calibration-intro");
+
     showScreen("cover");
     updateMetersUI();
+    startRealWalkTracking();
+}
+
+function startRealWalkTracking() {
+    if (!navigator.geolocation || !state.walkGoal) return;
+
+    if (state.watchId !== null) {
+        navigator.geolocation.clearWatch(state.watchId);
+    }
+
+    navigator.geolocation.getCurrentPosition((position) => {
+        state.walkStartLocation = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+        };
+
+        state.watchId = navigator.geolocation.watchPosition((position) => {
+            const distance = getDistanceInMeters(
+                state.walkStartLocation.lat,
+                state.walkStartLocation.lon,
+                position.coords.latitude,
+                position.coords.longitude
+            );
+
+            state.walkedMeters = Math.min(distance, state.walkGoal);
+            updateMetersUI();
+
+            if (state.walkedMeters >= state.walkGoal) {
+                finishWalkGoal();
+            }
+        }, () => {
+            console.log("Position konnte nicht gelesen werden.");
+        }, {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 10000
+        });
+    }, () => {
+        console.log("Startposition konnte nicht gesetzt werden.");
+    }, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000
+    });
+}
+
+function finishWalkGoal() {
+    if (state.watchId !== null) {
+        navigator.geolocation.clearWatch(state.watchId);
+        state.watchId = null;
+    }
+
+    const callback = state.afterWalk;
+
+    state.walkGoal = null;
+    state.walkedMeters = 0;
+    state.afterWalk = null;
+    state.walkStartLocation = null;
+
+    if (callback) callback();
 }
 
 function handleClick(event) {
