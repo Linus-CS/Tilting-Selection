@@ -58,10 +58,10 @@ function showScreen(name) {
 
         CompassInteraction.start({
             options: [
-                { key: "north", title: "Auswahl 1" },
-                { key: "east", title: "Auswahl 2" },
-                { key: "south", title: "Auswahl 3" },
-                { key: "west", title: "Auswahl 4" }
+                { key: "north", title: "Auswahl 1", description: "Drehe dich, bis dieser Punkt oben in den Klammern liegt." },
+                { key: "east", title: "Auswahl 2", description: "Halte die Position kurz, um die Auswahl einzuloggen." },
+                { key: "south", title: "Auswahl 3", description: "Nach dem Einloggen bestätigst du die Auswahl durch Gehen." },
+                { key: "west", title: "Auswahl 4", description: "Gehe 5 Meter geradeaus, um fortzufahren." }
             ],
             onConfirm: () => {
                 showScreen("calibration-page-turn");
@@ -72,10 +72,10 @@ function showScreen(name) {
     if (name === "distance-select") {
         CompassInteraction.start({
             options: [
-                { key: "north", title: "100 m", value: 100 },
-                { key: "east", title: "200 m", value: 200 },
-                { key: "south", title: "500 m", value: 500 },
-                { key: "west", title: "1 km", value: 1000 }
+                { key: "north", title: "100 m", value: 100, description: "Eine kurze Strecke zwischen den Artikeln." },
+                { key: "east", title: "200 m", value: 200, description: "Ein ruhiger Abstand, um kurz aus dem Text herauszutreten." },
+                { key: "south", title: "500 m", value: 500, description: "Mehr Raum zwischen zwei Leseabschnitten." },
+                { key: "west", title: "1 km", value: 1000, description: "Eine längere Wanderung zwischen den Artikeln." }
             ],
             onConfirm: (option) => {
                 state.selectedDistance = option.value;
@@ -101,7 +101,8 @@ function showScreen(name) {
                 return {
                     key: keys[index],
                     title: category.title,
-                    value: category.id
+                    value: category.id,
+                    description: category.compassDescription || category.intro || ""
                 };
             }),
             onLock: (option) => {
@@ -121,13 +122,15 @@ function showScreen(name) {
         const articleOptions = category.articles.slice(0, 3).map((article, index) => ({
             key: keys[index],
             title: article.title,
-            value: article.id
+            value: article.id,
+            description: article.compassDescription || article.description || article.excerpt || ""
         }));
 
         articleOptions.push({
             key: "west",
             title: "Zurück",
-            value: "back"
+            value: "back",
+            description: "Zurück zur Übersicht der Kategorien."
         });
 
         CompassInteraction.start({

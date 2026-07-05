@@ -13,7 +13,7 @@ body {
 
     font-family: "powell", sans-serif;
     background: #4f3226;
-    color: #fefff1;
+    color: #fff;
 }
 
 #app {
@@ -177,8 +177,8 @@ button:hover {
     padding: 1.5rem;
 
     border-radius: 1.2rem;
-    background: #fefff1;
-    color: #4f3226;
+    background: #fff;
+    color: #663024;
 }
 
 .overlay-card h1 {
@@ -324,8 +324,8 @@ button:hover {
     padding: 1.4rem;
 
     border-radius: 1rem;
-    background: #fefff1;
-    color: #4f3226;
+    background: #fff;
+    color: #663024;
 }
 
 .reader-controls {
@@ -350,7 +350,21 @@ button:hover {
 /* Compass Screens */
 
 .compass-screen {
+    background: #663024;
     padding: 0;
+}
+
+.compass-screen.is-compass-preview {
+    background: var(--90, linear-gradient(180deg, #663024 0%, #8AA0DD 39.9%, #FFF 93.27%));
+}
+
+.compass-preview {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.is-compass-preview .compass-preview {
+    opacity: 1;
 }
 
 .compass-screen.is-active {

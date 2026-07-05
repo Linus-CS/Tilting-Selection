@@ -4,21 +4,56 @@ const READER_CONTENT = {
         title: "Introduction",
         category: "Allgemein",
         pages: [
-            "Dies ist die erste Seite der Einleitung. Im finalen Reader würden diese Wörter beim Gehen langsam aus einer zufälligen Verteilung an ihre richtige Position wandern.",
-            "Dies ist die zweite Seite der Einleitung. Später wird das Umblättern nicht per Button, sondern durch deine Daumen-Kreisbewegung ausgelöst.",
-            "Nach der Einleitung folgt eine Laufpause. Danach kommst du zum Inhaltsverzeichnis."
+            "Dies ist die erste Seite der Einleitung.",
+            "Dies ist die zweite Seite der Einleitung.",
+            "Nach der Einleitung folgt eine Laufpause."
         ]
     },
+
+    distanceOptions: [
+        {
+            key: "north",
+            title: "100 m",
+            value: 100,
+            previewTitle: "100 Meter",
+            description: "Kurze Abschnitte. Gut, wenn du nah am Text bleiben möchtest."
+        },
+        {
+            key: "east",
+            title: "200 m",
+            value: 200,
+            previewTitle: "200 Meter",
+            description: "Ein ruhiger Rhythmus zwischen Lesen und Gehen."
+        },
+        {
+            key: "south",
+            title: "500 m",
+            value: 500,
+            previewTitle: "500 Meter",
+            description: "Mehr Abstand zwischen den Artikeln. Mehr Zeit zum Nachdenken."
+        },
+        {
+            key: "west",
+            title: "1 km",
+            value: 1000,
+            previewTitle: "1 Kilometer",
+            description: "Eine längere Laufpause. Der Reader wird stärker zur Wanderung."
+        }
+    ],
 
     categories: [
         {
             id: "creativity",
             title: "Creativity",
+            previewTitle: "Creativity",
+            description: "Gehen als kreative Methode, Umweg, Rhythmus und Denkform.",
             intro: "In dieser Oberkategorie geht es um Gehen als kreative Methode, als Umweg, als Rhythmus und als Denkform.",
             articles: [
                 {
                     id: "walking-as-method",
                     title: "Walking as Method",
+                    previewTitle: "Walking as Method",
+                    description: "Ein Text über Gehen als Werkzeug des Denkens und Forschens.",
                     pages: [
                         "Erste Seite des Artikels Walking as Method.",
                         "Zweite Seite des Artikels Walking as Method.",
@@ -28,54 +63,11 @@ const READER_CONTENT = {
                 {
                     id: "detour",
                     title: "Der Umweg",
+                    previewTitle: "Der Umweg",
+                    description: "Ein Text über Abschweifung, Orientierung und produktive Umwege.",
                     pages: [
                         "Erste Seite des Artikels Der Umweg.",
                         "Zweite Seite des Artikels Der Umweg."
-                    ]
-                }
-            ]
-        },
-        {
-            id: "knowledge",
-            title: "Knowledge",
-            intro: "Diese Kategorie fragt, wie Wissen durch Bewegung, Orientierung und körperliche Erfahrung entsteht.",
-            articles: [
-                {
-                    id: "situated-reading",
-                    title: "Situated Reading",
-                    pages: [
-                        "Erste Seite des Artikels Situated Reading.",
-                        "Zweite Seite des Artikels Situated Reading."
-                    ]
-                }
-            ]
-        },
-        {
-            id: "body",
-            title: "Body",
-            intro: "Hier geht es um den Körper als Interface: Schritte, Gleichgewicht, Erschöpfung, Richtung und Sensorik.",
-            articles: [
-                {
-                    id: "body-interface",
-                    title: "Body as Interface",
-                    pages: [
-                        "Erste Seite des Artikels Body as Interface.",
-                        "Zweite Seite des Artikels Body as Interface."
-                    ]
-                }
-            ]
-        },
-        {
-            id: "general",
-            title: "Walking",
-            intro: "Allgemeine Texte, Übergänge, Hinweise und Reflexionen zum Reader.",
-            articles: [
-                {
-                    id: "how-to-read",
-                    title: "How to Read While Walking",
-                    pages: [
-                        "Erste Seite des Artikels How to Read While Walking.",
-                        "Zweite Seite des Artikels How to Read While Walking."
                     ]
                 }
             ]

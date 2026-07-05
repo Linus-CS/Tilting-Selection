@@ -29,8 +29,12 @@ const CompassInteraction = (() => {
         west: 270
     };
 
+    function getActiveScreen() {
+        return document.querySelector(`[data-screen="${state.screen}"]`);
+    }
+
     function getActiveMeterElements() {
-        const screen = document.querySelector(`[data-screen="${state.screen}"]`);
+        const screen = getActiveScreen();
         if (!screen) return null;
 
         const display = screen.querySelector(".compass-meter-display");
@@ -39,6 +43,17 @@ const CompassInteraction = (() => {
         if (!display || !value) return null;
 
         return { display, value };
+    }
+
+    function getActivePreviewElements() {
+        const screen = getActiveScreen();
+        if (!screen) return null;
+
+        return {
+            screen,
+            title: screen.querySelector("[data-compass-preview-title]"),
+            description: screen.querySelector("[data-compass-preview-description]")
+        };
     }
 
     function start(config) {
@@ -52,6 +67,7 @@ const CompassInteraction = (() => {
 
         stopConfirmationWalk();
         hideMeters();
+        setPreview(null);
         update();
     }
 
@@ -66,6 +82,7 @@ const CompassInteraction = (() => {
 
         stopConfirmationWalk();
         hideMeters();
+        setPreview(null);
     }
 
     function getActiveElements() {
@@ -162,6 +179,28 @@ const CompassInteraction = (() => {
         }) || null;
     }
 
+    function setPreview(option) {
+        const preview = getActivePreviewElements();
+        if (!preview) return;
+
+        if (!option) {
+            preview.screen.classList.remove("is-compass-preview");
+            if (preview.title) preview.title.textContent = "";
+            if (preview.description) preview.description.textContent = "";
+            return;
+        }
+
+        preview.screen.classList.add("is-compass-preview");
+
+        if (preview.title) {
+            preview.title.textContent = option.previewTitle || option.title || "";
+        }
+
+        if (preview.description) {
+            preview.description.textContent = option.description || option.previewDescription || "";
+        }
+    }
+
     function updateMeters(remaining) {
         const meter = getActiveMeterElements();
         if (!meter) return;
@@ -195,6 +234,7 @@ const CompassInteraction = (() => {
         confirmStartLocation = null;
 
         hideMeters();
+        setPreview(null);
         setGlobalCompassTitle("");
 
         options.forEach((option) => placeDot(option, elements));
@@ -220,6 +260,7 @@ const CompassInteraction = (() => {
             if (lockedDot) lockedDot.classList.add("is-locked");
 
             setGlobalCompassTitle(lockedOption.title);
+            setPreview(lockedOption);
             return;
         }
 
@@ -230,6 +271,7 @@ const CompassInteraction = (() => {
         if (!optionInsideTarget) {
             hoveredOption = null;
             hoverStartTime = null;
+            setPreview(null);
             setGlobalCompassTitle("");
             return;
         }
@@ -261,6 +303,7 @@ const CompassInteraction = (() => {
             }
 
             setGlobalCompassTitle(lockedOption.title);
+            setPreview(lockedOption);
 
             if (typeof activeConfig.onLock === "function") {
                 activeConfig.onLock(lockedOption);
