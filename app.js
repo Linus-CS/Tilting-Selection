@@ -568,7 +568,7 @@ function updateCompassLockState(options, elements) {
     activeDot.classList.add("is-active");
     setGlobalCompassTitle(optionInsideTarget.title);
 
-    if (compassHoveredOption !== optionInsideTarget) {
+    if (!compassHoveredOption || compassHoveredOption.key !== optionInsideTarget.key) {
         compassHoveredOption = optionInsideTarget;
         compassHoverStartTime = Date.now();
         return;
