@@ -443,14 +443,6 @@ button:hover {
     background: #8AA0DD;
 }
 
-.dot.is-locked {
-    width: 2rem;
-    height: 2rem;
-
-    background: #fefff1;
-}
-
-
 [data-screen="calibration-intro"] {
     background-color: #8aa0dd;
 }

@@ -507,20 +507,16 @@ function getCompassOptionInsideTarget(options, elements) {
 function updateCompassLockState(options, elements) {
     clearCompassDotStates(elements);
 
-    // 1. Wenn ein Dot gelockt ist
     if (compassLockedOption) {
         const diff = compassAngleDifference(compassHeading, compassLockHeading);
 
-        // Unlock erst ab 45 Grad Drehung
-        if (diff >= COMPASS_UNLOCK_ANGLE) {
+        if (diff > COMPASS_UNLOCK_ANGLE) {
             compassLockedOption = null;
             compassLockHeading = null;
             compassHoveredOption = null;
             compassHoverStartTime = null;
             compassConfirmedOption = null;
             compassConfirmStartPosition = null;
-
-            localStorage.removeItem("compassConfirmStartLocation");
 
             setGlobalCompassTitle("");
 
@@ -531,25 +527,18 @@ function updateCompassLockState(options, elements) {
             return;
         }
 
-        // Dot bleibt im Target hängen
-        const lockedDot = elements.dots[compassLockedOption.key];
-        const targetRect = elements.target.getBoundingClientRect();
-        const ovalRect = elements.oval.getBoundingClientRect();
+        // Alle Dots bleiben sichtbar, aber drehen sich nicht weiter
+        options.forEach((option) => {
+            const dot = elements.dots[option.key];
+            if (dot) dot.style.display = "block";
+        });
 
-        const targetCenterX = targetRect.left + targetRect.width / 2;
-        const targetCenterY = targetRect.top + targetRect.height / 2;
-
-        lockedDot.style.display = "block";
-        lockedDot.style.left = `${targetCenterX - ovalRect.left}px`;
-        lockedDot.style.top = `${targetCenterY - ovalRect.top}px`;
-        lockedDot.classList.add("is-locked");
-
+        elements.dots[compassLockedOption.key].classList.add("is-locked");
         setGlobalCompassTitle(compassLockedOption.title);
 
         return;
     }
 
-    // 2. Normaler Zustand: alle Dots bewegen sich
     options.forEach((option) => {
         placeCompassDot(option, elements);
     });
@@ -579,8 +568,6 @@ function updateCompassLockState(options, elements) {
     if (hoverDuration >= COMPASS_LOCK_DELAY) {
         compassLockedOption = optionInsideTarget;
         compassLockHeading = compassHeading;
-        compassConfirmedOption = null;
-        compassConfirmStartPosition = null;
 
         compassHoveredOption = null;
         compassHoverStartTime = null;
@@ -597,6 +584,12 @@ function updateCompass() {
     if (!elements || !compassActiveConfig) return;
 
     const options = getCompassOptions();
+
+    if (!compassLockedOption) {
+        options.forEach((option) => {
+            placeCompassDot(option, elements);
+        });
+    }
 
     updateCompassLockState(options, elements);
 }
