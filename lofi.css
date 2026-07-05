@@ -12,7 +12,7 @@ body {
     overflow: hidden;
 
     font-family: "powell", sans-serif;
-    background: #4f3226;
+    background: #663024;
     color: #fff;
 }
 
@@ -22,9 +22,8 @@ body {
 
 /* Typography */
 
-.screen h1,
 .meter-display {
-    color: #fff;
+    color: #663024;
     font-family: "powell", sans-serif;
     font-style: normal;
     font-weight: 400;
@@ -34,6 +33,12 @@ body {
 
 .screen h1 {
     font-size: 5rem;
+    color: #fff;
+    font-family: "powell", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 0.9;
+    margin: 0;
 }
 
 h2 {
@@ -425,9 +430,7 @@ button:hover {
 }
 
 [data-compass-preview-description] {
-    margin: 0 auto;
-
-    max-width: 22ch;
+    margin: -3rem;
 
     color: #663024;
     text-align: center;
@@ -513,7 +516,7 @@ button:hover {
     height: 1.4rem;
 
     border-radius: 50%;
-    background-color: #663024;
+    background-color: transparent;
     border: 2px solid #fff;
 
     transform: translate(-50%, -50%);
