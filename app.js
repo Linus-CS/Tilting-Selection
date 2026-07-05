@@ -517,6 +517,10 @@ function updateCompassLockState(options, elements) {
             compassLockHeading = null;
             compassHoveredOption = null;
             compassHoverStartTime = null;
+            compassConfirmedOption = null;
+            compassConfirmStartPosition = null;
+
+            localStorage.removeItem("compassConfirmStartLocation");
 
             setGlobalCompassTitle("");
 
@@ -575,6 +579,8 @@ function updateCompassLockState(options, elements) {
     if (hoverDuration >= COMPASS_LOCK_DELAY) {
         compassLockedOption = optionInsideTarget;
         compassLockHeading = compassHeading;
+        compassConfirmedOption = null;
+        compassConfirmStartPosition = null;
 
         compassHoveredOption = null;
         compassHoverStartTime = null;
