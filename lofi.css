@@ -30,8 +30,8 @@ body {
     line-height: 0.9;
     margin: 0;
 
-    position: fixed;
-    bottom: -2rem;
+    position: absolute;
+    bottom: 0;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -513,7 +513,8 @@ button:hover {
     text-transform: uppercase;
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 [data-compass-preview-description] {
@@ -523,6 +524,10 @@ button:hover {
     font-family: "powell", sans-serif;
     font-size: 1rem;
     line-height: 1.35;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* Compass Dots */
