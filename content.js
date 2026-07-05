@@ -1,7 +1,7 @@
 const READER_CONTENT = {
     introArticle: {
         id: "introduction",
-        title: "Einleitung",
+        title: "Introduction",
         category: "Allgemein",
         pages: [
             "Dies ist die erste Seite der Einleitung. Im finalen Reader würden diese Wörter beim Gehen langsam aus einer zufälligen Verteilung an ihre richtige Position wandern.",
@@ -13,7 +13,7 @@ const READER_CONTENT = {
     categories: [
         {
             id: "creativity",
-            title: "Kreativität",
+            title: "Creativity",
             intro: "In dieser Oberkategorie geht es um Gehen als kreative Methode, als Umweg, als Rhythmus und als Denkform.",
             articles: [
                 {
@@ -37,7 +37,7 @@ const READER_CONTENT = {
         },
         {
             id: "knowledge",
-            title: "Wissensproduktion",
+            title: "Knowledge",
             intro: "Diese Kategorie fragt, wie Wissen durch Bewegung, Orientierung und körperliche Erfahrung entsteht.",
             articles: [
                 {
@@ -52,7 +52,7 @@ const READER_CONTENT = {
         },
         {
             id: "body",
-            title: "Körper",
+            title: "Body",
             intro: "Hier geht es um den Körper als Interface: Schritte, Gleichgewicht, Erschöpfung, Richtung und Sensorik.",
             articles: [
                 {
@@ -67,7 +67,7 @@ const READER_CONTENT = {
         },
         {
             id: "general",
-            title: "Allgemeines",
+            title: "Walking",
             intro: "Allgemeine Texte, Übergänge, Hinweise und Reflexionen zum Reader.",
             articles: [
                 {

@@ -1,3 +1,7 @@
+/* app.js
+   Restliche App-Logik. Compass-Code liegt in compass-interaction.js.
+*/
+
 const state = {
     screen: "cover",
     selectedDistance: null,
@@ -14,14 +18,12 @@ const state = {
 };
 
 let displayedMeters = 0;
-const coverScreen = document.querySelector('[data-screen="cover"]');
 
+const coverScreen = document.querySelector('[data-screen="cover"]');
 const screens = document.querySelectorAll("[data-screen]");
 const permissionOverlay = document.querySelector("#permissionOverlay");
-const permissionButton = document.querySelector("#permissionButton");
 const permissionStatus = document.querySelector("#permissionStatus");
 
-const globalStatus = document.querySelector("#globalStatus");
 const coverMeters = document.querySelector("#coverMeters");
 const transitionMeters = document.querySelector("#transitionMeters");
 const walkingAnimation = document.querySelector("#walkingAnimation");
@@ -38,9 +40,6 @@ const categoryIntro = document.querySelector("#categoryIntro");
 const categoryCompassTitle = document.querySelector("#categoryCompassTitle");
 const categoryArticleOptions = document.querySelector("#categoryArticleOptions");
 
-const compassMeterDisplay = document.querySelector(".compass-meter-display");
-const compassMeters = document.querySelector("#compassMeters");
-
 const globalCategoryTitle = document.querySelector(".nav-bar .category-title h2");
 
 function showScreen(name) {
@@ -51,12 +50,13 @@ function showScreen(name) {
     });
 
     setGlobalCompassTitle("");
+    CompassInteraction.stop();
 
     if (name === "calibration-compass") {
         setCompassInstruction("Drehe dich und wähle einen Punkt aus");
         animateCompassInstruction();
 
-        startCompassInteraction({
+        CompassInteraction.start({
             options: [
                 { key: "north", title: "Auswahl 1" },
                 { key: "east", title: "Auswahl 2" },
@@ -70,7 +70,7 @@ function showScreen(name) {
     }
 
     if (name === "distance-select") {
-        startCompassInteraction({
+        CompassInteraction.start({
             options: [
                 { key: "north", title: "100 m", value: 100 },
                 { key: "east", title: "200 m", value: 200 },
@@ -80,17 +80,21 @@ function showScreen(name) {
             onConfirm: (option) => {
                 state.selectedDistance = option.value;
 
-                startWalkGoal(50, () => {
-                    renderArticle(READER_CONTENT.introArticle, {
-                        eyebrow: "Einleitung"
-                    });
-                }, "Gehe 50m bis zur ersten Seite.");
+                startWalkGoal(
+                    50,
+                    () => {
+                        renderArticle(READER_CONTENT.introArticle, {
+                            eyebrow: "Einleitung"
+                        });
+                    },
+                    "Gehe 50m bis zur ersten Seite."
+                );
             }
         });
     }
 
     if (name === "main-toc") {
-        startCompassInteraction({
+        CompassInteraction.start({
             options: READER_CONTENT.categories.slice(0, 4).map((category, index) => {
                 const keys = ["north", "east", "south", "west"];
 
@@ -126,7 +130,7 @@ function showScreen(name) {
             value: "back"
         });
 
-        startCompassInteraction({
+        CompassInteraction.start({
             options: articleOptions,
             onLock: (option) => {
                 setTimeout(() => {
@@ -151,6 +155,7 @@ function startWalkGoal(meters, callback, label = "Gehe weiter.") {
     updateMetersUI();
 
     showScreen("walk-transition");
+    startRealWalkTracking();
 }
 
 function simulateWalk(amount = 10) {
@@ -160,11 +165,7 @@ function simulateWalk(amount = 10) {
     updateMetersUI();
 
     if (state.walkedMeters >= state.walkGoal) {
-        const callback = state.afterWalk;
-        state.walkGoal = null;
-        state.walkedMeters = 0;
-        state.afterWalk = null;
-        if (callback) callback();
+        finishWalkGoal();
     }
 }
 
@@ -172,15 +173,20 @@ function updateMetersUI() {
     const remaining = Math.max(0, Math.ceil((state.walkGoal || 0) - state.walkedMeters));
     const progress = state.walkGoal ? state.walkedMeters / state.walkGoal : 0;
 
-    coverMeters.textContent = state.screen === "cover" ? remaining || 50 : coverMeters.textContent;
-    transitionMeters.textContent = remaining;
+    if (coverMeters && state.screen === "cover") {
+        coverMeters.textContent = remaining || 50;
+    }
 
-    walkingAnimation.style.setProperty("--walk-progress", `${progress * 100}%`);
+    if (transitionMeters) {
+        transitionMeters.textContent = remaining;
+    }
 
+    if (walkingAnimation) {
+        walkingAnimation.style.setProperty("--walk-progress", `${progress * 100}%`);
+    }
 }
 
 function animateWalk() {
-
     displayedMeters += (state.walkedMeters - displayedMeters) * 0.08;
 
     if (coverScreen && state.walkGoal) {
@@ -230,17 +236,25 @@ function pageTurn() {
 
 function handleArticleFinished() {
     if (state.currentArticle.id === "introduction") {
-        startWalkGoal(state.selectedDistance || 100, () => {
-            renderMainToc();
-            showScreen("main-toc");
-        }, "Laufpause bis zum Inhaltsverzeichnis.");
+        startWalkGoal(
+            state.selectedDistance || 100,
+            () => {
+                renderMainToc();
+                showScreen("main-toc");
+            },
+            "Laufpause bis zum Inhaltsverzeichnis."
+        );
         return;
     }
 
-    startWalkGoal(state.selectedDistance || 100, () => {
-        renderCategoryCompass(state.currentCategoryId);
-        showScreen("category-compass");
-    }, "Laufpause zurück zur Artikelübersicht.");
+    startWalkGoal(
+        state.selectedDistance || 100,
+        () => {
+            renderCategoryCompass(state.currentCategoryId);
+            showScreen("category-compass");
+        },
+        "Laufpause zurück zur Artikelübersicht."
+    );
 }
 
 function renderMainToc() {
@@ -279,7 +293,6 @@ function animateCompassInstruction() {
     if (!instruction) return;
 
     const text = instruction.textContent.trim();
-
     instruction.innerHTML = "";
 
     [...text].forEach((char, index) => {
@@ -335,181 +348,17 @@ function selectArticle(articleId) {
         category: category.title
     };
 
-    startWalkGoal(50, () => {
-        renderArticle(articleWithCategory, { eyebrow: category.title });
-    }, `Gehe 50m bis zum Artikel „${article.title}“.`);
+    startWalkGoal(
+        50,
+        () => {
+            renderArticle(articleWithCategory, { eyebrow: category.title });
+        },
+        `Gehe 50m bis zum Artikel „${article.title}“.`
+    );
 }
 
 function findCategory(categoryId) {
     return READER_CONTENT.categories.find((category) => category.id === categoryId);
-}
-
-let compassHeading = 0;
-let compassActiveConfig = null;
-let compassHoveredOption = null;
-let compassHoverStartTime = null;
-let compassLockedOption = null;
-let compassLockHeading = null;
-let compassConfirmedOption = null;
-let compassConfirmStartPosition = null;
-
-let compassConfirmWatchId = null;
-let compassConfirmStartLocation = null;
-
-const COMPASS_CONFIRM_DISTANCE = 5;
-
-const COMPASS_LOCK_DELAY = 1000;
-const COMPASS_UNLOCK_ANGLE = 90;
-
-const compassAngles = {
-    north: 0,
-    east: 90,
-    south: 180,
-    west: 270
-};
-
-function startCompassInteraction(config) {
-    compassActiveConfig = config;
-    compassHoveredOption = null;
-    compassHoverStartTime = null;
-    compassLockedOption = null;
-    compassLockHeading = null;
-    compassConfirmedOption = null;
-    compassConfirmStartPosition = null;
-
-    updateCompass();
-}
-
-function updateCompassMeters(remaining) {
-    if (!compassMeterDisplay || !compassMeters) return;
-
-    compassMeters.textContent = Math.max(0, Math.ceil(remaining));
-    compassMeterDisplay.classList.add("is-visible");
-}
-
-function hideCompassMeters() {
-    if (!compassMeterDisplay) return;
-
-    compassMeterDisplay.classList.remove("is-visible");
-}
-
-function getActiveCompassElements() {
-    const container = document.querySelector(
-        `[data-screen="${state.screen}"] .compass-container`
-    );
-
-    if (!container) return null;
-
-    return {
-        container,
-        oval: container.querySelector(".compass-oval"),
-        target: container.querySelector(".target-compass"),
-        dots: {
-            north: container.querySelector(".dot-north"),
-            east: container.querySelector(".dot-east"),
-            south: container.querySelector(".dot-south"),
-            west: container.querySelector(".dot-west")
-        }
-    };
-}
-
-function getCompassOptions() {
-    if (!compassActiveConfig) return [];
-
-    return compassActiveConfig.options.map((option) => ({
-        ...option,
-        angle: compassAngles[option.key]
-    }));
-}
-
-function placeCompassDot(option, elements) {
-    const dot = elements.dots[option.key];
-    if (!dot) return;
-
-    const width = elements.oval.offsetWidth;
-    const height = elements.oval.offsetHeight;
-
-    const cx = width / 2;
-    const cy = height / 2;
-
-    const borderWidth = 2;
-
-    const rx = width / 2 - borderWidth / 2;
-    const ry = height / 2 - borderWidth / 2;
-
-    const angleDeg = compassHeading + option.angle;
-    const angle = (angleDeg - 90) * Math.PI / 180;
-
-    const x = cx + rx * Math.cos(angle);
-    const y = cy + ry * Math.sin(angle);
-
-    dot.style.display = "block";
-    dot.style.left = `${x}px`;
-    dot.style.top = `${y}px`;
-}
-
-function isCompassDotInsideTarget(dot, target) {
-    const dotRect = dot.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
-
-    const dotCenterX = dotRect.left + dotRect.width / 2;
-    const dotCenterY = dotRect.top + dotRect.height / 2;
-
-    return (
-        dotCenterX >= targetRect.left &&
-        dotCenterX <= targetRect.right &&
-        dotCenterY >= targetRect.top &&
-        dotCenterY <= targetRect.bottom
-    );
-}
-
-function compassAngleDifference(a, b) {
-    let diff = Math.abs(a - b);
-
-    if (diff > 180) {
-        diff = 360 - diff;
-    }
-
-    return diff;
-}
-
-function getDistanceFromStartLocation() {
-    const stored = localStorage.getItem("startLocation");
-
-    if (!stored || !navigator.geolocation) return;
-
-    const start = JSON.parse(stored);
-
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const distance = getDistanceInMeters(
-                start.lat,
-                start.lon,
-                position.coords.latitude,
-                position.coords.longitude
-            );
-
-            if (
-                compassLockedOption &&
-                compassActiveConfig &&
-                distance >= 10
-            ) {
-                const confirmedOption = compassLockedOption;
-
-                compassConfirmedOption = confirmedOption;
-
-                if (typeof compassActiveConfig.onConfirm === "function") {
-                    compassActiveConfig.onConfirm(confirmedOption);
-                }
-            }
-        },
-        () => { },
-        {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 5000
-        }
-    );
 }
 
 function getDistanceInMeters(lat1, lon1, lat2, lon2) {
@@ -530,255 +379,6 @@ function getDistanceInMeters(lat1, lon1, lat2, lon2) {
 
     return R * c;
 }
-
-function clearCompassDotStates(elements) {
-    Object.values(elements.dots).forEach((dot) => {
-        dot.classList.remove("is-active");
-        dot.classList.remove("is-locked");
-        dot.style.display = "none";
-    });
-}
-
-function getCompassOptionInsideTarget(options, elements) {
-    return options.find((option) => {
-        const dot = elements.dots[option.key];
-        return dot && isCompassDotInsideTarget(dot, elements.target);
-    }) || null;
-}
-
-function updateCompassLockState(options, elements) {
-    clearCompassDotStates(elements);
-
-    if (compassLockedOption) {
-        const diff = compassAngleDifference(compassHeading, compassLockHeading);
-
-        if (diff > COMPASS_UNLOCK_ANGLE) {
-            if (compassConfirmWatchId !== null) {
-                navigator.geolocation.clearWatch(compassConfirmWatchId);
-                compassConfirmWatchId = null;
-            }
-
-            compassLockedOption = null;
-            compassLockHeading = null;
-            compassHoveredOption = null;
-            compassHoverStartTime = null;
-            compassConfirmedOption = null;
-            compassConfirmStartLocation = null;
-
-            setGlobalCompassTitle("");
-
-            options.forEach((option) => {
-                placeCompassDot(option, elements);
-            });
-
-            return;
-            hideCompassMeters();
-        }
-
-        options.forEach((option) => {
-            const dot = elements.dots[option.key];
-            if (dot) dot.style.display = "block";
-        });
-
-        elements.dots[compassLockedOption.key].classList.add("is-locked");
-        setGlobalCompassTitle(compassLockedOption.title);
-
-        return;
-    }
-
-    options.forEach((option) => {
-        placeCompassDot(option, elements);
-    });
-
-    const optionInsideTarget = getCompassOptionInsideTarget(options, elements);
-
-    if (!optionInsideTarget) {
-        compassHoveredOption = null;
-        compassHoverStartTime = null;
-        setGlobalCompassTitle("");
-        return;
-    }
-
-    const activeDot = elements.dots[optionInsideTarget.key];
-
-    activeDot.classList.add("is-active");
-    setGlobalCompassTitle(optionInsideTarget.title);
-
-    if (!compassHoveredOption || compassHoveredOption.key !== optionInsideTarget.key) {
-        compassHoveredOption = optionInsideTarget;
-        compassHoverStartTime = Date.now();
-        return;
-    }
-
-    const hoverDuration = Date.now() - compassHoverStartTime;
-
-    if (hoverDuration >= COMPASS_LOCK_DELAY) {
-        compassLockedOption = optionInsideTarget;
-        compassLockHeading = compassHeading;
-        compassConfirmedOption = null;
-
-        compassHoveredOption = null;
-        compassHoverStartTime = null;
-
-        activeDot.classList.remove("is-active");
-        activeDot.classList.add("is-locked");
-
-        setGlobalCompassTitle(compassLockedOption.title);
-
-        startCompassConfirmationWalk(compassLockedOption);
-        updateCompassMeters(COMPASS_CONFIRM_DISTANCE);
-    }
-}
-
-function updateCompass() {
-    const elements = getActiveCompassElements();
-    if (!elements || !compassActiveConfig) return;
-
-    const options = getCompassOptions();
-
-    if (!compassLockedOption) {
-        options.forEach((option) => {
-            placeCompassDot(option, elements);
-        });
-    }
-
-    updateCompassLockState(options, elements);
-}
-
-function startCompassConfirmationWalk(option) {
-    if (!navigator.geolocation) {
-        console.log("Geolocation wird nicht unterstützt.");
-        return;
-    }
-
-    if (compassConfirmWatchId !== null) {
-        navigator.geolocation.clearWatch(compassConfirmWatchId);
-        compassConfirmWatchId = null;
-    }
-
-    updateCompassMeters(COMPASS_CONFIRM_DISTANCE);
-
-    navigator.geolocation.getCurrentPosition((position) => {
-        compassConfirmStartLocation = {
-            lat: position.coords.latitude,
-            lon: position.coords.longitude
-        };
-
-        compassConfirmWatchId = navigator.geolocation.watchPosition((position) => {
-            if (!compassLockedOption || compassConfirmedOption) return;
-
-            const distance = getDistanceInMeters(
-                compassConfirmStartLocation.lat,
-                compassConfirmStartLocation.lon,
-                position.coords.latitude,
-                position.coords.longitude
-            );
-
-            const remaining = Math.max(0, COMPASS_CONFIRM_DISTANCE - distance);
-
-            updateCompassMeters(remaining);
-
-            console.log("Compass confirm distance:", distance);
-            console.log("Compass confirm remaining:", remaining);
-
-            if (distance >= COMPASS_CONFIRM_DISTANCE) {
-                compassConfirmedOption = option;
-
-                if (compassConfirmWatchId !== null) {
-                    navigator.geolocation.clearWatch(compassConfirmWatchId);
-                    compassConfirmWatchId = null;
-                }
-
-                compassConfirmStartLocation = null;
-                hideCompassMeters();
-
-                if (typeof compassActiveConfig.onConfirm === "function") {
-                    compassActiveConfig.onConfirm(option);
-                }
-            }
-        }, () => {
-            console.log("Bestätigung durch Gehen konnte nicht gemessen werden.");
-        }, {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 10000
-        });
-    }, () => {
-        console.log("Startposition für Kompass-Bestätigung konnte nicht gesetzt werden.");
-    }, {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 10000
-    });
-}
-
-function saveCompassConfirmStartLocation() {
-    if (!navigator.geolocation) return;
-
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            localStorage.setItem(
-                "compassConfirmStartLocation",
-                JSON.stringify({
-                    lat: position.coords.latitude,
-                    lon: position.coords.longitude
-                })
-            );
-        },
-        () => { },
-        {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 5000
-        }
-    );
-}
-
-function checkCompassConfirmationByDistance() {
-    if (!navigator.geolocation || !compassLockedOption || compassConfirmedOption) return;
-
-    const stored = localStorage.getItem("compassConfirmStartLocation");
-    if (!stored) return;
-
-    const start = JSON.parse(stored);
-
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const distance = getDistanceInMeters(
-                start.lat,
-                start.lon,
-                position.coords.latitude,
-                position.coords.longitude
-            );
-
-            if (distance >= 10) {
-                compassConfirmedOption = compassLockedOption;
-
-                if (typeof compassActiveConfig.onConfirm === "function") {
-                    compassActiveConfig.onConfirm(compassConfirmedOption);
-                }
-            }
-        },
-        () => { },
-        {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 5000
-        }
-    );
-}
-
-function handleOrientation(event) {
-    if (event.webkitCompassHeading !== undefined) {
-        compassHeading = event.webkitCompassHeading;
-    } else if (event.alpha !== null) {
-        compassHeading = 360 - event.alpha;
-    }
-
-    updateCompass();
-}
-
-window.addEventListener("deviceorientation", handleOrientation, true);
 
 async function requestPermissions() {
     permissionStatus.textContent = "Berechtigungen werden angefragt …";
@@ -863,40 +463,48 @@ function startRealWalkTracking() {
         navigator.geolocation.clearWatch(state.watchId);
     }
 
-    navigator.geolocation.getCurrentPosition((position) => {
-        state.walkStartLocation = {
-            lat: position.coords.latitude,
-            lon: position.coords.longitude
-        };
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            state.walkStartLocation = {
+                lat: position.coords.latitude,
+                lon: position.coords.longitude
+            };
 
-        state.watchId = navigator.geolocation.watchPosition((position) => {
-            const distance = getDistanceInMeters(
-                state.walkStartLocation.lat,
-                state.walkStartLocation.lon,
-                position.coords.latitude,
-                position.coords.longitude
+            state.watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const distance = getDistanceInMeters(
+                        state.walkStartLocation.lat,
+                        state.walkStartLocation.lon,
+                        position.coords.latitude,
+                        position.coords.longitude
+                    );
+
+                    state.walkedMeters = Math.min(distance, state.walkGoal);
+                    updateMetersUI();
+
+                    if (state.walkedMeters >= state.walkGoal) {
+                        finishWalkGoal();
+                    }
+                },
+                () => {
+                    console.log("Position konnte nicht gelesen werden.");
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 10000
+                }
             );
-
-            state.walkedMeters = Math.min(distance, state.walkGoal);
-            updateMetersUI();
-
-            if (state.walkedMeters >= state.walkGoal) {
-                finishWalkGoal();
-            }
-        }, () => {
-            console.log("Position konnte nicht gelesen werden.");
-        }, {
+        },
+        () => {
+            console.log("Startposition konnte nicht gesetzt werden.");
+        },
+        {
             enableHighAccuracy: true,
             maximumAge: 0,
             timeout: 10000
-        });
-    }, () => {
-        console.log("Startposition konnte nicht gesetzt werden.");
-    }, {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 10000
-    });
+        }
+    );
 }
 
 function finishWalkGoal() {
@@ -960,7 +568,5 @@ function handleClick(event) {
 document.addEventListener("click", handleClick);
 
 showScreen("cover");
-
 permissionOverlay?.classList.add("is-visible");
-
 animateWalk();

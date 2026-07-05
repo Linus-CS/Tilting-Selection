@@ -381,7 +381,7 @@ button:hover {
 
     width: 90vw;
 
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -75%);
 }
 
 .compass-screen.is-active {
@@ -469,13 +469,14 @@ button:hover {
     height: 1.4rem;
 
     border-radius: 50%;
-    background: currentColor;
+    background-color: #663024;
+    border: 2px solid #fff;
 
     transform: translate(-50%, -50%);
 }
 
 .dot.is-locked {
-    background: #8AA0DD;
+    background: #fff;
 }
 
 
@@ -484,7 +485,11 @@ button:hover {
 }
 
 [data-screen="distance-select"] {
-    background: linear-gradient(180deg, #663024 0%, #8AA0DD 39.9%);
+    background-color: #663024;
+}
+
+[data-screen="main-toc"] {
+    background-color: #663024;
 }
 
 .compass-meter-display {

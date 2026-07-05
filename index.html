@@ -11,6 +11,7 @@
     <script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js"></script>
 
     <script defer src="content.js"></script>
+    <script defer src="compass-interaction.js"></script>
     <script defer src="app.js"></script>
 
     <link rel="manifest" href="/manifest.json">
@@ -146,36 +147,15 @@
 
                 </div>
             </div>
-            <!-- <button data-action="next" data-next="walk-transition">
-                laufpause
-            </button> -->
-        </section>
-
-        <section data-screen="walk-transition" class="screen">
-            <p class="eyebrow">Laufpause</p>
-            <h1 id="walkTransitionTitle">Gehe weiter.</h1>
-
-            <div class="walking-animation" id="walkingAnimation"></div>
-
-            <p>Noch <span id="transitionMeters">50</span> m</p>
-            <button data-action="simulate-walk">+ 10m gehen</button>
-        </section>
-
-        <section data-screen="article-reader" class="screen article-screen">
-            <p class="eyebrow" id="articleEyebrow">Artikel</p>
-            <h1 id="articleTitle"></h1>
-
-            <article id="articlePage"></article>
-
-            <div class="reader-controls">
-                <p>Seite <span id="pageCurrent">1</span> / <span id="pageTotal">1</span></p>
-                <button data-action="page-turn">Umblättern simulieren</button>
+            <div class="meter-display compass-meter-display">
+                <span id="compassMeters">5</span>m
             </div>
+            <button data-action="next" data-next="main-toc">
+                Kategorie
+            </button>
         </section>
 
         <section data-screen="main-toc" class="screen compass-screen">
-            <p class="eyebrow">Inhaltsverzeichnis</p>
-            <h1>Wähle eine Oberkategorie.</h1>
 
             <div class="compass-container" data-compass="main-toc">
                 <div class="compass-wrapper">
@@ -189,7 +169,11 @@
                         <div class="dot dot-east"></div>
                         <div class="dot dot-south"></div>
                         <div class="dot dot-west"></div>
+
+                        <h3 class="compass-question">Choose a category</h3>
                     </div>
+
+
                 </div>
             </div>
         </section>
@@ -219,6 +203,29 @@
                         <div class="dot dot-west"></div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+
+        <section data-screen="walk-transition" class="screen">
+            <p class="eyebrow">Laufpause</p>
+            <h1 id="walkTransitionTitle">Gehe weiter.</h1>
+
+            <div class="walking-animation" id="walkingAnimation"></div>
+
+            <p>Noch <span id="transitionMeters">50</span> m</p>
+            <button data-action="simulate-walk">+ 10m gehen</button>
+        </section>
+
+        <section data-screen="article-reader" class="screen article-screen">
+            <p class="eyebrow" id="articleEyebrow">Artikel</p>
+            <h1 id="articleTitle"></h1>
+
+            <article id="articlePage"></article>
+
+            <div class="reader-controls">
+                <p>Seite <span id="pageCurrent">1</span> / <span id="pageTotal">1</span></p>
+                <button data-action="page-turn">Umblättern simulieren</button>
             </div>
         </section>
 
