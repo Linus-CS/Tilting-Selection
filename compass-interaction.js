@@ -185,12 +185,14 @@ const CompassInteraction = (() => {
 
         if (!option) {
             preview.screen.classList.remove("is-compass-preview");
+            preview.screen.classList.remove("is-compass-locked");
             if (preview.title) preview.title.textContent = "";
             if (preview.description) preview.description.textContent = "";
             return;
         }
 
         preview.screen.classList.add("is-compass-preview");
+        preview.screen.classList.add("is-compass-locked");
 
         if (preview.title) {
             preview.title.textContent = option.previewTitle || option.title || "";

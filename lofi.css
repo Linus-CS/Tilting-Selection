@@ -359,8 +359,37 @@ button:hover {
 /* Compass Screens */
 
 .compass-screen {
+    position: relative;
+    overflow: hidden;
+
     background: #663024;
     padding: 0;
+}
+
+.compass-screen::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    background: linear-gradient(180deg,
+            #663024 0%,
+            #8AA0DD 39.9%,
+            #FFF 93.27%);
+
+    transform: translateY(100%);
+    transition: transform 700ms ease;
+    pointer-events: none;
+}
+
+.compass-screen.is-compass-locked::before {
+    transform: translateY(0);
+}
+
+.compass-screen>* {
+    position: relative;
+    z-index: 1;
 }
 
 .compass-screen.is-compass-preview {
@@ -377,6 +406,13 @@ button:hover {
 
     padding: 2rem 0;
     pointer-events: none;
+
+    opacity: 0;
+    transition: opacity 300ms ease;
+}
+
+.compass-screen.is-compass-locked .compass-preview {
+    opacity: 1;
 }
 
 .is-compass-preview .compass-preview {
@@ -415,7 +451,7 @@ button:hover {
     transform: translate(-50%, -75%);
 }
 
-.compass-screen.is-compass-preview .compass-question {
+.compass-screen.is-compass-locked .compass-question {
     display: none;
 }
 
@@ -525,8 +561,8 @@ button:hover {
     height: 1.4rem;
 
     border-radius: 50%;
-    background-color: transparent;
-    border: 2px solid #663024;
+    background-color: #663024;
+    border: 2px solid #fff;
 
     transform: translate(-50%, -50%);
 }
