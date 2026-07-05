@@ -59,6 +59,22 @@ h3 {
     text-transform: uppercase;
 }
 
+.calltoaction-svg {
+    width: 100%;
+    overflow: visible;
+}
+
+.calltoaction {
+    font-family: "powell", sans-serif;
+    font-size: 48px;
+
+    fill: transparent;
+    stroke: #fff;
+    stroke-width: 10px;
+    stroke-linejoin: round;
+    paint-order: stroke fill;
+}
+
 .screen p,
 .screen article {
     margin: 0;
@@ -420,9 +436,28 @@ button:hover {
     left: 50%;
     top: 50%;
 
-    width: 70vw;
+    width: 515px;
+    max-width: 90vw;
+    height: 168px;
 
     transform: translate(-50%, -50%);
+}
+
+.compass-instruction .char {
+    position: absolute;
+
+    --offset: calc(var(--char-index) * 0.75rem);
+
+    offset-path: path("M.4 84.1s127.4 188 267.7 0 247.3 0 247.3 0");
+    offset-distance: var(--offset);
+
+    animation: instruction-move 1500ms infinite alternate forwards;
+}
+
+@keyframes instruction-move {
+    100% {
+        offset-distance: calc(var(--offset) + 12rem);
+    }
 }
 
 /* Compass Dots */

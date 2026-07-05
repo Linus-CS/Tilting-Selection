@@ -50,7 +50,8 @@ function showScreen(name) {
     setGlobalCompassTitle("");
 
     if (name === "calibration-compass") {
-        setCompassInstruction("Drehe dich so, dass ein Punkt oben einrastet.");
+        setCompassInstruction("Drehe dich und wähle einen Punkt aus");
+        animateCompassInstruction();
 
         startCompassInteraction({
             options: [
@@ -267,6 +268,26 @@ function setCompassInstruction(text = "") {
     }
 }
 
+function animateCompassInstruction() {
+    const instruction = document.querySelector(
+        '[data-screen="calibration-compass"] .compass-instruction'
+    );
+
+    if (!instruction) return;
+
+    const text = instruction.textContent.trim();
+
+    instruction.innerHTML = "";
+
+    [...text].forEach((char, index) => {
+        const span = document.createElement("span");
+        span.className = "char";
+        span.style.setProperty("--char-index", index);
+        span.textContent = char === " " ? "\u00A0" : char;
+        instruction.appendChild(span);
+    });
+}
+
 function selectCategory(categoryId) {
     const category = findCategory(categoryId);
     if (!category) return;
@@ -329,7 +350,12 @@ let compassLockHeading = null;
 let compassConfirmedOption = null;
 let compassConfirmStartPosition = null;
 
-const COMPASS_LOCK_DELAY = 2000;
+let compassConfirmWatchId = null;
+let compassConfirmStartLocation = null;
+
+const COMPASS_CONFIRM_DISTANCE = 5;
+
+const COMPASS_LOCK_DELAY = 1000;
 const COMPASS_UNLOCK_ANGLE = 90;
 
 const compassAngles = {
@@ -511,12 +537,17 @@ function updateCompassLockState(options, elements) {
         const diff = compassAngleDifference(compassHeading, compassLockHeading);
 
         if (diff > COMPASS_UNLOCK_ANGLE) {
+            if (compassConfirmWatchId !== null) {
+                navigator.geolocation.clearWatch(compassConfirmWatchId);
+                compassConfirmWatchId = null;
+            }
+
             compassLockedOption = null;
             compassLockHeading = null;
             compassHoveredOption = null;
             compassHoverStartTime = null;
             compassConfirmedOption = null;
-            compassConfirmStartPosition = null;
+            compassConfirmStartLocation = null;
 
             setGlobalCompassTitle("");
 
@@ -527,7 +558,6 @@ function updateCompassLockState(options, elements) {
             return;
         }
 
-        // Alle Dots bleiben sichtbar, aber drehen sich nicht weiter
         options.forEach((option) => {
             const dot = elements.dots[option.key];
             if (dot) dot.style.display = "block";
@@ -568,6 +598,7 @@ function updateCompassLockState(options, elements) {
     if (hoverDuration >= COMPASS_LOCK_DELAY) {
         compassLockedOption = optionInsideTarget;
         compassLockHeading = compassHeading;
+        compassConfirmedOption = null;
 
         compassHoveredOption = null;
         compassHoverStartTime = null;
@@ -576,6 +607,8 @@ function updateCompassLockState(options, elements) {
         activeDot.classList.add("is-locked");
 
         setGlobalCompassTitle(compassLockedOption.title);
+
+        startCompassConfirmationWalk(compassLockedOption);
     }
 }
 
@@ -592,6 +625,57 @@ function updateCompass() {
     }
 
     updateCompassLockState(options, elements);
+}
+
+function startCompassConfirmationWalk(option) {
+    if (!navigator.geolocation) return;
+
+    if (compassConfirmWatchId !== null) {
+        navigator.geolocation.clearWatch(compassConfirmWatchId);
+        compassConfirmWatchId = null;
+    }
+
+    navigator.geolocation.getCurrentPosition((position) => {
+        compassConfirmStartLocation = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+        };
+
+        compassConfirmWatchId = navigator.geolocation.watchPosition((position) => {
+            if (!compassLockedOption || compassConfirmedOption) return;
+
+            const distance = getDistanceInMeters(
+                compassConfirmStartLocation.lat,
+                compassConfirmStartLocation.lon,
+                position.coords.latitude,
+                position.coords.longitude
+            );
+
+            if (distance >= COMPASS_CONFIRM_DISTANCE) {
+                compassConfirmedOption = option;
+
+                navigator.geolocation.clearWatch(compassConfirmWatchId);
+                compassConfirmWatchId = null;
+                compassConfirmStartLocation = null;
+
+                if (typeof compassActiveConfig.onConfirm === "function") {
+                    compassActiveConfig.onConfirm(option);
+                }
+            }
+        }, () => {
+            console.log("Bestätigung durch Gehen konnte nicht gemessen werden.");
+        }, {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 10000
+        });
+    }, () => {
+        console.log("Startposition für Kompass-Bestätigung konnte nicht gesetzt werden.");
+    }, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000
+    });
 }
 
 function saveCompassConfirmStartLocation() {
