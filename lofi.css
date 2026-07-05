@@ -66,6 +66,18 @@ h2 {
     text-transform: uppercase;
 }
 
+.screen.article-screen h2 {
+    color: #663024;
+}
+
+body.is-article-screen .nav-bar h2 {
+    color: #663024;
+}
+
+body.is-article-screen .nav-bar .cursor {
+    background: #663024;
+}
+
 h3 {
     color: #663024;
     text-align: center;
@@ -75,6 +87,23 @@ h3 {
     font-weight: 400;
     line-height: normal;
     text-transform: uppercase;
+    margin: 1rem;
+}
+
+h4 {
+    text-align: center;
+    font-family: "powell", sans-serif;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin: 0;
+}
+
+.author {
+    fill: transparent;
+    -webkit-text-stroke: 8px #663024;
+    paint-order: stroke fill;
 }
 
 .calltoaction-svg {
@@ -339,20 +368,6 @@ button {
     transition: left 0.4s ease;
 }
 
-/* Article Reader */
-
-.article-screen article {
-    padding: 1.4rem;
-
-    border-radius: 1rem;
-    background: #fff;
-    color: #663024;
-}
-
-.reader-controls {
-    margin-top: 1rem;
-}
-
 /* Bottom Status */
 
 .bottom-progress {
@@ -576,4 +591,14 @@ button {
     padding: 0;
 
     transform: translateX(-50%);
+}
+
+/* Intro */
+
+[data-screen="article-intro"] {
+    background: linear-gradient(180deg, #8AA0DD 0%, #FFF 30.29%);
+}
+
+.article-text {
+    color: #663024;
 }

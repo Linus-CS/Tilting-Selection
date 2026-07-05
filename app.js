@@ -45,6 +45,11 @@ const globalCategoryTitle = document.querySelector(".nav-bar .category-title h2"
 function showScreen(name) {
     state.screen = name;
 
+    document.body.classList.toggle(
+        "is-article-screen",
+        document.querySelector(`[data-screen="${name}"]`)?.classList.contains("article-screen")
+    );
+
     screens.forEach((screen) => {
         screen.classList.toggle("is-active", screen.dataset.screen === name);
     });
