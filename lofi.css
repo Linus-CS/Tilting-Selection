@@ -486,3 +486,12 @@ button:hover {
 [data-screen="distance-select"] {
     background: linear-gradient(180deg, #663024 0%, #8AA0DD 39.9%);
 }
+
+.compass-meter-display {
+    display: none;
+    z-index: 9;
+}
+
+.compass-meter-display.is-visible {
+    display: block;
+}

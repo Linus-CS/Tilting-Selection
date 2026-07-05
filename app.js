@@ -38,6 +38,9 @@ const categoryIntro = document.querySelector("#categoryIntro");
 const categoryCompassTitle = document.querySelector("#categoryCompassTitle");
 const categoryArticleOptions = document.querySelector("#categoryArticleOptions");
 
+const compassMeterDisplay = document.querySelector(".compass-meter-display");
+const compassMeters = document.querySelector("#compassMeters");
+
 const globalCategoryTitle = document.querySelector(".nav-bar .category-title h2");
 
 function showScreen(name) {
@@ -377,6 +380,19 @@ function startCompassInteraction(config) {
     updateCompass();
 }
 
+function updateCompassMeters(remaining) {
+    if (!compassMeterDisplay || !compassMeters) return;
+
+    compassMeters.textContent = Math.max(0, Math.ceil(remaining));
+    compassMeterDisplay.classList.add("is-visible");
+}
+
+function hideCompassMeters() {
+    if (!compassMeterDisplay) return;
+
+    compassMeterDisplay.classList.remove("is-visible");
+}
+
 function getActiveCompassElements() {
     const container = document.querySelector(
         `[data-screen="${state.screen}"] .compass-container`
@@ -556,6 +572,7 @@ function updateCompassLockState(options, elements) {
             });
 
             return;
+            hideCompassMeters();
         }
 
         options.forEach((option) => {
@@ -609,6 +626,7 @@ function updateCompassLockState(options, elements) {
         setGlobalCompassTitle(compassLockedOption.title);
 
         startCompassConfirmationWalk(compassLockedOption);
+        updateCompassMeters(COMPASS_CONFIRM_DISTANCE);
     }
 }
 
@@ -628,12 +646,17 @@ function updateCompass() {
 }
 
 function startCompassConfirmationWalk(option) {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+        console.log("Geolocation wird nicht unterstützt.");
+        return;
+    }
 
     if (compassConfirmWatchId !== null) {
         navigator.geolocation.clearWatch(compassConfirmWatchId);
         compassConfirmWatchId = null;
     }
+
+    updateCompassMeters(COMPASS_CONFIRM_DISTANCE);
 
     navigator.geolocation.getCurrentPosition((position) => {
         compassConfirmStartLocation = {
@@ -651,12 +674,23 @@ function startCompassConfirmationWalk(option) {
                 position.coords.longitude
             );
 
+            const remaining = Math.max(0, COMPASS_CONFIRM_DISTANCE - distance);
+
+            updateCompassMeters(remaining);
+
+            console.log("Compass confirm distance:", distance);
+            console.log("Compass confirm remaining:", remaining);
+
             if (distance >= COMPASS_CONFIRM_DISTANCE) {
                 compassConfirmedOption = option;
 
-                navigator.geolocation.clearWatch(compassConfirmWatchId);
-                compassConfirmWatchId = null;
+                if (compassConfirmWatchId !== null) {
+                    navigator.geolocation.clearWatch(compassConfirmWatchId);
+                    compassConfirmWatchId = null;
+                }
+
                 compassConfirmStartLocation = null;
+                hideCompassMeters();
 
                 if (typeof compassActiveConfig.onConfirm === "function") {
                     compassActiveConfig.onConfirm(option);
