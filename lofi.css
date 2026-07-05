@@ -29,6 +29,15 @@ body {
     font-weight: 400;
     line-height: 0.9;
     margin: 0;
+
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+[data-screen="cover"] .meter-display {
+    color: white;
 }
 
 .screen h1 {
@@ -366,6 +375,7 @@ button:hover {
     padding: 0;
 }
 
+/* Animierter Gradient-Layer */
 .compass-screen::before {
     content: "";
 
@@ -387,102 +397,22 @@ button:hover {
     transform: translateY(0);
 }
 
+/* Inhalte liegen über dem Gradient */
 .compass-screen>* {
     position: relative;
     z-index: 1;
 }
 
-.compass-screen.is-compass-preview {
-    background: var(--90, linear-gradient(180deg, #663024 0%, #8AA0DD 39.9%, #FFF 93.27%));
-}
-
-.compass-preview {
-    position: absolute;
-    inset: 0;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    padding: 2rem 0;
-    pointer-events: none;
-
-    opacity: 0;
-    transition: opacity 300ms ease;
-}
-
-.compass-screen.is-compass-locked .compass-preview {
-    opacity: 1;
-}
-
-.is-compass-preview .compass-preview {
-    opacity: 1;
-}
-
-.compass-screen.is-active {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-
-    height: 100dvh;
-    padding: 0;
-}
-
-.compass-screen>.eyebrow {
-    position: fixed;
-    left: 50%;
-    bottom: 1rem;
-    z-index: 8;
-
-    padding: 0;
-
-    transform: translateX(-50%);
-}
-
-.compass-question {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    color: #fff;
-
-    width: 90vw;
-
-    transform: translate(-50%, -75%);
-}
-
-.compass-screen.is-compass-locked .compass-question {
-    display: none;
-}
-
 .compass-screen.is-active {
     display: flex;
     flex-direction: column;
 
     height: 100dvh;
+    padding: 0;
     overflow: hidden;
 }
 
-[data-compass-preview-title] {
-    margin: 0;
-
-    color: #663024;
-    text-align: center;
-    font-family: "powell", sans-serif;
-    font-size: 36px;
-    font-weight: 400;
-    text-transform: uppercase;
-}
-
-[data-compass-preview-description] {
-    margin: -3rem;
-
-    color: #663024;
-    text-align: center;
-    font-family: "powell", sans-serif;
-    font-size: 1rem;
-    line-height: 1.35;
-}
+/* Compass Layout */
 
 .compass-container {
     flex: 1;
@@ -513,49 +443,92 @@ button:hover {
     border-radius: 50%;
 }
 
+/* Target */
+
 .target-compass {
     position: absolute;
     top: -0.6rem;
     left: 50%;
     z-index: 5;
 
+    display: flex;
+    column-gap: 1.5rem;
+
     transform: translateX(-50%);
     pointer-events: none;
 }
 
-.compass-instruction {
+/* State 1 Question */
+
+.compass-question {
     position: absolute;
-    left: 50%;
     top: 50%;
+    left: 50%;
+    z-index: 2;
 
-    width: 515px;
-    max-width: 90vw;
-    height: 168px;
+    width: 90vw;
+    margin: 0;
 
-    transform: translate(-50%, -50%);
+    color: #fff;
+    text-align: center;
+
+    transform: translate(-50%, -75%);
 }
 
-.compass-instruction .char {
+.compass-screen.is-compass-locked .compass-question {
+    display: none;
+}
+
+/* State 2 Preview */
+
+.compass-preview {
     position: absolute;
+    inset: 0;
+    z-index: 2;
 
-    --offset: calc(var(--char-index) * 0.75rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
-    offset-path: path("M.4 84.1s127.4 188 267.7 0 247.3 0 247.3 0");
-    offset-distance: var(--offset);
+    padding: 2rem 0;
 
-    animation: instruction-move 1500ms infinite alternate forwards;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease;
 }
 
-@keyframes instruction-move {
-    100% {
-        offset-distance: calc(var(--offset) + 12rem);
-    }
+.compass-screen.is-compass-locked .compass-preview {
+    opacity: 1;
+}
+
+[data-compass-preview-title] {
+    margin: 0;
+
+    color: #663024;
+    text-align: center;
+    font-family: "powell", sans-serif;
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+[data-compass-preview-description] {
+    max-width: 24ch;
+    margin: 0 auto -3rem;
+
+    color: #663024;
+    text-align: center;
+    font-family: "powell", sans-serif;
+    font-size: 1rem;
+    line-height: 1.35;
 }
 
 /* Compass Dots */
 
 .dot {
     position: absolute;
+    z-index: 4;
 
     width: 1.4rem;
     height: 1.4rem;
@@ -571,18 +544,7 @@ button:hover {
     background: #fff;
 }
 
-
-[data-screen="calibration-intro"] {
-    background-color: #8aa0dd;
-}
-
-[data-screen="distance-select"] {
-    background-color: #663024;
-}
-
-[data-screen="main-toc"] {
-    background-color: #663024;
-}
+/* Compass Meter */
 
 .compass-meter-display {
     display: none;
@@ -591,4 +553,17 @@ button:hover {
 
 .compass-meter-display.is-visible {
     display: block;
+}
+
+/* Compass Eyebrow */
+
+.compass-screen>.eyebrow {
+    position: fixed;
+    left: 50%;
+    bottom: 1rem;
+    z-index: 8;
+
+    padding: 0;
+
+    transform: translateX(-50%);
 }
