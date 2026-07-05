@@ -439,9 +439,10 @@ button:hover {
     transform: translate(-50%, -50%);
 }
 
-.dot-north {
+.dot.is-locked {
     background: #8AA0DD;
 }
+
 
 [data-screen="calibration-intro"] {
     background-color: #8aa0dd;

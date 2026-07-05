@@ -330,7 +330,7 @@ let compassConfirmedOption = null;
 let compassConfirmStartPosition = null;
 
 const COMPASS_LOCK_DELAY = 2000;
-const COMPASS_UNLOCK_ANGLE = 180;
+const COMPASS_UNLOCK_ANGLE = 90;
 
 const compassAngles = {
     north: 0,
