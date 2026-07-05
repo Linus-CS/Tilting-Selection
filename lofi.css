@@ -93,12 +93,11 @@ h3 {
     paint-order: stroke fill;
 }
 
-.screen p,
-.screen article {
+p {
     margin: 0;
     font-family: "powell", sans-serif;
-    font-size: 1rem;
-    line-height: 1.35;
+    font-size: 1.1rem;
+    line-height: 1.2;
 }
 
 .eyebrow {
@@ -156,16 +155,18 @@ button {
     cursor: pointer;
 }
 
-button:hover {
-    background: rgba(255, 255, 255, 0.12);
-}
-
 #permissionButton {
     position: relative;
-    right: auto;
-    bottom: auto;
-
+    right: 0;
+    bottom: 0;
+    border-radius: 0%;
+    border-top: 1px solid #663024;
+    border-left: 0px;
+    border-right: 0px;
+    border-bottom: 0px;
+    padding: 1rem;
     width: 100%;
+    margin-top: 0.5rem;
 }
 
 /* Overlay */
@@ -192,16 +193,18 @@ button:hover {
 
 .overlay-card {
     max-width: 560px;
-    padding: 1.5rem;
 
     border-radius: 1.2rem;
     background: #fff;
     color: #663024;
 }
 
-.overlay-card h1 {
-    margin-top: 0;
-    font-size: 2.5rem;
+.overlay-card p {
+    padding: 1rem;
+}
+
+.status-text {
+    padding: 0 !important;
 }
 
 /* Navigation */
@@ -524,6 +527,7 @@ button:hover {
     font-family: "powell", sans-serif;
     font-size: 1rem;
     line-height: 1.35;
+    width: 90vw;
     position: absolute;
     bottom: 0;
     left: 50%;
