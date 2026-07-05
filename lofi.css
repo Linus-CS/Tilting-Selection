@@ -41,6 +41,10 @@ body {
     margin: 0;
 }
 
+#coverMeters {
+    color: #fff;
+}
+
 h2 {
     margin: 0;
 
@@ -404,10 +408,15 @@ button:hover {
     position: absolute;
     top: 50%;
     left: 50%;
+    color: #fff;
 
     width: 90vw;
 
     transform: translate(-50%, -75%);
+}
+
+.compass-screen.is-compass-preview .compass-question {
+    display: none;
 }
 
 .compass-screen.is-active {
@@ -517,7 +526,7 @@ button:hover {
 
     border-radius: 50%;
     background-color: transparent;
-    border: 2px solid #fff;
+    border: 2px solid #663024;
 
     transform: translate(-50%, -50%);
 }
