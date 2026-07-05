@@ -507,43 +507,47 @@ function getCompassOptionInsideTarget(options, elements) {
 function updateCompassLockState(options, elements) {
     clearCompassDotStates(elements);
 
+    // 1. Wenn ein Dot gelockt ist
     if (compassLockedOption) {
         const diff = compassAngleDifference(compassHeading, compassLockHeading);
 
-        if (diff > COMPASS_UNLOCK_ANGLE) {
+        // Unlock erst ab 45 Grad Drehung
+        if (diff >= COMPASS_UNLOCK_ANGLE) {
             compassLockedOption = null;
             compassLockHeading = null;
             compassHoveredOption = null;
             compassHoverStartTime = null;
-            compassConfirmedOption = null;
 
-            localStorage.removeItem("compassConfirmStartLocation");
             setGlobalCompassTitle("");
 
             options.forEach((option) => {
                 placeCompassDot(option, elements);
-                elements.dots[option.key].style.display = "block";
             });
 
             return;
         }
 
+        // Dot bleibt im Target hängen
         const lockedDot = elements.dots[compassLockedOption.key];
+        const targetRect = elements.target.getBoundingClientRect();
+        const ovalRect = elements.oval.getBoundingClientRect();
 
-        if (lockedDot) {
-            lockedDot.style.display = "block";
-            lockedDot.classList.add("is-locked");
-        }
+        const targetCenterX = targetRect.left + targetRect.width / 2;
+        const targetCenterY = targetRect.top + targetRect.height / 2;
+
+        lockedDot.style.display = "block";
+        lockedDot.style.left = `${targetCenterX - ovalRect.left}px`;
+        lockedDot.style.top = `${targetCenterY - ovalRect.top}px`;
+        lockedDot.classList.add("is-locked");
 
         setGlobalCompassTitle(compassLockedOption.title);
 
-        checkCompassConfirmationByDistance();
         return;
     }
 
+    // 2. Normaler Zustand: alle Dots bewegen sich
     options.forEach((option) => {
         placeCompassDot(option, elements);
-        elements.dots[option.key].style.display = "block";
     });
 
     const optionInsideTarget = getCompassOptionInsideTarget(options, elements);
@@ -556,6 +560,7 @@ function updateCompassLockState(options, elements) {
     }
 
     const activeDot = elements.dots[optionInsideTarget.key];
+
     activeDot.classList.add("is-active");
     setGlobalCompassTitle(optionInsideTarget.title);
 
@@ -578,7 +583,6 @@ function updateCompassLockState(options, elements) {
         activeDot.classList.add("is-locked");
 
         setGlobalCompassTitle(compassLockedOption.title);
-        saveCompassConfirmStartLocation();
     }
 }
 
