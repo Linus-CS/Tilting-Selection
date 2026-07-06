@@ -4,18 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Walking Reader – LoFi</title>
+    <title>Walking Reader</title>
 
-    <link rel="stylesheet" href="lofi.css">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://use.typekit.net/ofh6jca.css">
-    <script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js"></script>
 
-    <script defer src="content.js"></script>
-    <script defer src="compass-interaction.js"></script>
-    <script defer src="app.js"></script>
+    <script src="https://unpkg.com/splitting/dist/splitting.min.js"></script>
+
+    <script src="src/util/log.js"></script>
+    <script src="src/util/walk.js"></script>
+    <script src="src/util/screen.js"></script>
+    <script defer src="src/util/permissions.js"></script>
+    <script defer src="src/util/compass.js"></script>
+
+
+    <script defer src="src/main.js"></script>
+    <script defer src="src/onboarding.js"></script>
+    <script defer src="src/distance.js"></script>
+    <script defer src="src/intro.js"></script>
+    <script defer src="src/category.js"></script>
+    <script defer src="src/article.js"></script>
+    <script defer src="src/articles.js"></script>
 
     <link rel="manifest" href="/manifest.json">
-
     <meta name="theme-color" content="#ffffff">
 
     <!-- wichtig für iOS / Safari -->
@@ -26,20 +38,7 @@
 </head>
 
 <body>
-
-    <div id="permissionOverlay" class="overlay is-visible">
-        <div class="overlay-card">
-            <p>
-                Footnotes is a digital reader that you navigate by walking. To continue, this website needs access to
-                your location, orientation and motion sensors.
-            </p>
-            <button id="permissionButton">Allow Access</button>
-            <p id="permissionStatus" class="status-text"></p>
-        </div>
-    </div>
-
     <main id="app">
-
         <div class="nav-bar">
             <div class="toc">
                 <h2>(</h2>
@@ -62,13 +61,11 @@
             </div>
 
             <div class="walk-animation">
-                <img src="/assets/platzhalter-coveranimation.svg" alt="">
+                <img src="./platzhalter-coveranimation.svg" alt="">
             </div>
             <div class="meter-display">
                 <span id="coverMeters">50</span>m
             </div>
-
-            <button data-action="simulate-walk">+ 10m gehen</button>
         </section>
 
         <section data-screen="calibration-intro" class="screen">
@@ -78,8 +75,8 @@
             <button data-action="next" data-next="calibration-compass">Start</button>
         </section>
 
-        <section data-screen="calibration-compass" class="screen compass-screen">
-            <div class="compass-container" data-compass="calibration">
+        <section data-screen="compass" class="screen compass-screen">
+            <div class="compass-container">
 
                 <div class="compass-wrapper">
                     <div class="target-compass">
@@ -88,58 +85,13 @@
                     </div>
 
                     <div class="compass-oval">
+                        <div class="dot dot-north-west"></div>
                         <div class="dot dot-north"></div>
+                        <div class="dot dot-north-east"></div>
                         <div class="dot dot-east"></div>
+                        <div class="dot dot-south-east"></div>
                         <div class="dot dot-south"></div>
-                        <div class="dot dot-west"></div>
-
-                        <div class="compass-preview">
-                            <h2 data-compass-preview-title></h2>
-                            <p data-compass-preview-description></p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <!-- <div class="meter-display compass-meter-display">
-                <span id="compassMeters">5</span>m
-            </div> -->
-
-            <p class="eyebrow">Kalibrierung 1/3</p>
-
-            <button data-action="next" data-next="calibration-page-turn">
-                Kalibrierung 2/3
-            </button>
-        </section>
-
-        <section data-screen="calibration-page-turn" class="screen">
-            <p class="eyebrow">Kalibrierung 2/3</p>
-            <h1>Umblättern</h1>
-            <p>Später blätterst du durch eine Kreisbewegung mit dem Daumen weiter.</p>
-            <button data-action="next" data-next="calibration-shake">Umblättern simulieren</button>
-        </section>
-
-        <section data-screen="calibration-shake" class="screen">
-            <p class="eyebrow">Kalibrierung 3/3</p>
-            <h1>Schütteln</h1>
-            <p>Durch Schütteln kannst du später bestimmte Navigationen auslösen.</p>
-            <button data-action="next" data-next="distance-select">Schütteln simulieren</button>
-        </section>
-
-        <section data-screen="distance-select" class="screen compass-screen">
-
-            <div class="compass-container" data-compass="distance">
-                <div class="compass-wrapper">
-
-                    <div class="target-compass">
-                        <h2>(</h2>
-                        <h2>)</h2>
-                    </div>
-
-                    <div class="compass-oval">
-                        <div class="dot dot-north"></div>
-                        <div class="dot dot-east"></div>
-                        <div class="dot dot-south"></div>
+                        <div class="dot dot-south-west"></div>
                         <div class="dot dot-west"></div>
 
                         <div class="compass-preview">
@@ -148,33 +100,61 @@
                         </div>
                     </div>
 
-                    <h3 class="compass-question">Wie weit möchtest du zwischen den Artikeln gehen?</h3>
-
+                    <h3 class="compass-question" data-compass-question></h3>
                 </div>
+
             </div>
-            <!-- <div class="meter-display compass-meter-display">
+            <div class="meter-display" data-compass-meter-display>
                 <span id="compassMeters">5</span>m
-            </div> -->
-            <button data-action="next" data-next="article-intro">
-                Einleitungstext
-            </button>
+            </div>
         </section>
 
-        <section data-screen="article-intro" class="screen article-screen">
+        <section data-screen="article" class="screen article-screen">
             <div class="category-title">
                 <h2>INTRODUCTION</h2>
             </div>
-            <h3>One step after another</h3>
-            <h4 class="author">Mona Ortner & Helen Hausdorf</h4>
+            <div class="article-head">
+                <h3>One step after another</h3>
+                <h4 class="author">Mona Ortner & Helen Hausdorf</h4>
+            </div>
 
-            <svg xmlns="http://www.w3.org/2000/svg" width="343" height="187" viewBox="0 0 343 187" fill="none">
-                <path
-                    d="M181.073 102.426C190.457 93.2788 196.18 81.0493 200.143 68.4698C202.214 61.8939 201.569 54.3513 199.887 47.3635C198.206 40.3757 194.783 34.024 189.824 28.2883C184.866 22.5527 178.477 17.6256 170.832 13.2941C163.187 8.96271 154.481 5.37623 144.857 3.24621C135.232 1.11619 124.954 0.551312 114.323 1.33974C103.692 2.12817 93.0212 4.28702 82.5215 7.55971C72.0217 10.8324 62.0169 15.1535 53.0398 20.0196C44.0627 24.8857 36.4164 30.1658 29.9363 35.8197C23.4562 41.4736 18.374 47.3412 13.9142 53.5401C9.45445 59.7391 5.77121 66.0914 3.48086 73.2933C1.19051 80.4951 0.404659 88.354 1.46552 96.521C2.52639 104.688 5.45779 112.925 10.1285 120.694C14.7993 128.462 21.1205 135.513 29.0459 142.612C36.9714 149.712 46.3094 156.645 57.4821 162.726C68.6549 168.807 81.3793 173.826 95.7255 177.632C110.072 181.438 125.654 183.88 153.118 184.719C180.582 185.558 301.481 186.229 341.533 185.364"
-                    stroke="#663023" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            <p class="article-text">Walking teaches us where we belong.
-                It is a form of noticing, revealing systems
-                we don't usually see,
+            <div class="headline-path">
+                <svg viewBox="0 0 515 168" xmlns="http://www.w3.org/2000/svg">
+                    <path id="headline-path"
+                        d="M1.0175 5.62769C0.960286 5.62769 1.01327 9.92407 1.64055 18.1275C2.20913 25.5633 6.54753 32.333 11.6911 39.0877C17.07 46.1514 24.2014 50.7204 30.3567 54.01C35.9842 57.0175 42.8067 57.3004 50.1516 57.733C54.0788 57.9642 58.4346 57.6808 63.2063 56.9915C67.9779 56.3022 73.0392 55.0779 87.9861 47.4204C102.933 39.7629 127.612 25.7092 143.019 17.3709C158.425 9.03263 163.81 6.83564 169.842 5.1443C175.874 3.45296 182.389 2.33385 189.393 1.64669C196.397 0.959526 203.692 0.738228 211.026 1.38741C218.359 2.03659 225.51 3.56296 241.421 10.1051C257.332 16.6473 281.788 28.159 298.018 36.5307"
+                        fill="none" stroke="none" />
+
+                    <text class="headline-text headline-stroke">
+                        <textPath href="#headline-path" startOffset="-80%">
+                            Go outside and start walking
+                        </textPath>
+                    </text>
+
+                    <text class="headline-text headline-fill">
+                        <textPath href="#headline-path" startOffset="-80%">
+                            Go outside and start walking
+                        </textPath>
+                    </text>
+                </svg>
+            </div>
+
+            <div class="article-path">
+                <svg viewBox="0 0 343 187" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+
+                    <path id="intro-path"
+                        d="M181.073 102.426C190.457 93.2788 196.18 81.0493 200.143 68.4698C202.214 61.8939 201.569 54.3513 199.887 47.3635C198.206 40.3757 194.783 34.024 189.824 28.2883C184.866 22.5527 178.477 17.6256 170.832 13.2941C163.187 8.96271 154.481 5.37623 144.857 3.24621C135.232 1.11619 124.954 0.551312 114.323 1.33974C103.692 2.12817 93.0212 4.28702 82.5215 7.55971C72.0217 10.8324 62.0169 15.1535 53.0398 20.0196C44.0627 24.8857 36.4164 30.1658 29.9363 35.8197C23.4562 41.4736 18.374 47.3412 13.9142 53.5401C9.45445 59.7391 5.77121 66.0914 3.48086 73.2933C1.19051 80.4951 0.404659 88.354 1.46552 96.521C2.52639 104.688 5.45779 112.925 10.1285 120.694C14.7993 128.462 21.1205 135.513 29.0459 142.612C36.9714 149.712 46.3094 156.645 57.4821 162.726C68.6549 168.807 81.3793 173.826 95.7255 177.632C110.072 181.438 125.654 183.88 153.118 184.719C180.582 185.558 301.481 186.229 341.533 185.364"
+                        fill="none" stroke="none" />
+
+                    <text class="path-text">
+                        <textPath href="#intro-path" startOffset="0%">
+                            Walking teaches us where we belong.
+                            It is a form of noticing, revealing systems we don't
+                        </textPath>
+                    </text>
+
+                </svg>
+            </div>
+            <p class="article-text"> usually see,
                 reminding us of our speed,
                 our place in a web of interrelations
                 with environment, society, community.
@@ -198,99 +178,40 @@
                 not only from each other,
                 but from our senses, our bodies, and thought processes
                 that can't be pushed, grasped, or put into order,
-                the rhythm and speed of walking, just walking
+                the rhythm and speed of walking, just walking,
                 become almost a slow protest.
                 Putting one foot in front of the other turns into a counter-act
                 against a digital environment
                 where the traces we leave with our thumbs
                 on slippery displays become profit,
                 and our attention a commodity.
+
+                Walking can weave our thoughts
+                to the landscape we move through,
+                opening a space where thinking, perception, and exchange
+                happen differently.
+                Most digital applications are designed to be fast,
+                immediate and remove friction.
+                Walking has its own own beat and pace,
+                ones we can't simply scroll past.
+                Making space for the unpredictable to enter
+                might mean to slow down on purpose,
+                to stand impatience and to get lost
+
+                And so, this leaflet holds a map of scores:
+                short notations, prompts for movement and thought,
+                gathered along the way.
+                It won't show you the right path,
+                or help you find a particular place.
+                Take it instead as an invitation to make a step
+                on a stony surface, rather than a swipe on a polished screen.
+                You are surrounded by scores that can serve
+                as starting points for thought while you walk, meander,
+                and let your mind drift.
             </p>
         </section>
 
-        <section data-screen="main-toc" class="screen compass-screen">
 
-            <div class="compass-container" data-compass="main-toc">
-                <div class="compass-wrapper">
-                    <div class="target-compass">
-                        <h2>(</h2>
-                        <h2>)</h2>
-                    </div>
-
-                    <div class="compass-oval">
-                        <div class="dot dot-north"></div>
-                        <div class="dot dot-east"></div>
-                        <div class="dot dot-south"></div>
-                        <div class="dot dot-west"></div>
-
-                        <h3 class="compass-question">Choose a category</h3>
-
-                        <div class="compass-preview">
-                            <h2 data-compass-preview-title></h2>
-                            <p data-compass-preview-description></p>
-                        </div>
-                    </div>
-
-
-                </div>
-            </div>
-        </section>
-
-        <section data-screen="category-intro" class="screen">
-            <p class="eyebrow">Oberkategorie</p>
-            <h1 id="categoryTitle"></h1>
-            <p id="categoryIntro"></p>
-            <button data-action="open-category-compass">Zur Artikelübersicht</button>
-        </section>
-
-        <section data-screen="category-compass" class="screen compass-screen">
-            <p class="eyebrow">Artikelübersicht</p>
-            <h1 id="categoryCompassTitle"></h1>
-
-            <div class="compass-container" data-compass="category-articles">
-                <div class="compass-wrapper">
-                    <div class="target-compass">
-                        <h2>(</h2>
-                        <h2>)</h2>
-                    </div>
-
-                    <div class="compass-oval">
-                        <div class="dot dot-north"></div>
-                        <div class="dot dot-east"></div>
-                        <div class="dot dot-south"></div>
-                        <div class="dot dot-west"></div>
-
-                        <div class="compass-preview">
-                            <h2 data-compass-preview-title></h2>
-                            <p data-compass-preview-description></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <section data-screen="walk-transition" class="screen">
-            <p class="eyebrow">Laufpause</p>
-            <h1 id="walkTransitionTitle">Gehe weiter.</h1>
-
-            <div class="walking-animation" id="walkingAnimation"></div>
-
-            <p>Noch <span id="transitionMeters">50</span> m</p>
-            <button data-action="simulate-walk">+ 10m gehen</button>
-        </section>
-
-        <section data-screen="article-reader" class="screen article-screen">
-            <p class="eyebrow" id="articleEyebrow">Artikel</p>
-            <h1 id="articleTitle"></h1>
-
-            <article id="articlePage"></article>
-
-            <div class="reader-controls">
-                <p>Seite <span id="pageCurrent">1</span> / <span id="pageTotal">1</span></p>
-                <button data-action="page-turn">Umblättern simulieren</button>
-            </div>
-        </section>
 
     </main>
 

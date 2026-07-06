@@ -8,16 +8,10 @@ html,
 body {
     margin: 0;
     width: 100vw;
-    height: 100vh;
-    overflow: hidden;
 
     font-family: "powell", sans-serif;
     background: #663024;
     color: #fff;
-}
-
-#app {
-    min-height: 100vh;
 }
 
 /* Typography */
@@ -38,16 +32,6 @@ body {
 
 [data-screen="cover"] .meter-display {
     color: white;
-}
-
-.screen h1 {
-    font-size: 5rem;
-    color: #fff;
-    font-family: "powell", sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 0.9;
-    margin: 0;
 }
 
 #coverMeters {
@@ -150,10 +134,19 @@ p {
 
 .screen {
     display: none;
-
-    height: 100vh;
     padding: 1rem;
 }
+
+.screen h1 {
+    font-size: 5rem;
+    color: #fff;
+    font-family: "powell", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 0.9;
+    margin: 0;
+}
+
 
 .screen.is-active {
     position: relative;
@@ -567,17 +560,6 @@ button {
 
 .dot.is-locked {
     background: #fff;
-}
-
-/* Compass Meter */
-
-.compass-meter-display {
-    display: none;
-    z-index: 9;
-}
-
-.compass-meter-display.is-visible {
-    display: block;
 }
 
 /* Compass Eyebrow */

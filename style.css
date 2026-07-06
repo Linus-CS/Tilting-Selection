@@ -1,0 +1,87 @@
+[data-screen="article"] {
+    display: none;
+    padding: 3rem 1rem 100vh 1rem;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, #8AA0DD 0%, #FFF 30.29%);
+    min-height: 100vh;
+    touch-action: none;
+}
+
+[data-screen="mona-lisa"],
+[data-screen="bona-bisa"],
+[data-screen="homer-lisa-simpson"] {
+    display: none;
+}
+
+body,
+.article-screen,
+.article-screen * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.article-head {
+    margin-bottom: 4rem;
+}
+
+.article-path {
+    width: 95vw;
+    margin-bottom: 0.2rem;
+}
+
+.article-path svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#intro-path {
+    fill: none;
+    stroke: none;
+}
+
+.path-text {
+    fill: #663024;
+    font-family: "powell", sans-serif;
+    font-size: 1.1rem;
+}
+
+.headline-path {
+    width: 100%;
+    height: 168px;
+    position: relative;
+}
+
+.headline-path svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.headline-text {
+    font-family: "powell", sans-serif;
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin: 0;
+}
+
+.headline-stroke {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 10px;
+    stroke-linejoin: round;
+}
+
+.headline-fill {
+    fill: #663024;
+    stroke: none;
+}
+
+.headline-path-right {
+    margin-left: auto;
+    right: -10rem;
+    left: auto;
+}
