@@ -19,7 +19,6 @@ function trackPosition(position) {
 
     const distance = getDistanceInMeters(lastPos.lat, lastPos.lon, position.coords.latitude, position.coords.longitude);
 
-
     if (distance >= 1) {
         lastPos = { lat: position.coords.latitude, lon: position.coords.longitude };
 
@@ -27,18 +26,18 @@ function trackPosition(position) {
         walkedMeters += distance;
 
         if (onChangeWalk !== null)
-            onChangeWalk(walkedMeters)
+            onChangeWalk(walkedMeters, walkGoal - Math.round(walkedMeters))
 
         if (walkedMeters >= walkGoal) {
+            stopWalk();
             if (onFinishedWalk !== null)
                 onFinishedWalk();
-            stopWalk();
         }
     }
 }
 
 function startWalk(goal, callback1, callback2) {
-    callback1(0);
+    callback1(0, goal);
     if (goal == 0) {
         callback2();
         return;
@@ -52,8 +51,6 @@ function startWalk(goal, callback1, callback2) {
 function stopWalk() {
     walkGoal = Number.MAX_SAFE_INTEGER;
     walkedMeters = -Number.MAX_SAFE_INTEGER;
-    onChangeWalk = null;
-    onFinishedWalk = null;
 }
 
 function getDistanceInMeters(lat1, lon1, lat2, lon2) {

@@ -21,7 +21,9 @@ const west = container.querySelector(".dot-west");
 
 const dots = { northWest, north, northEast, east, southEast, south, southWest, west };
 
+const distanceTitle = document.querySelector(".distance-title");
 const globalCategoryTitle = document.querySelector(".nav-bar .category-title h2");
+const articleTitle = document.querySelector(".article-title h2");
 
 let heading = 0;
 
@@ -35,6 +37,15 @@ const UNLOCK_ANGLE = 90;
 let options = [];
 
 let finishCallback = () => { };
+
+let compassMode = "default";
+let articleWalkInProgress = false;
+
+function getCompassTitleElement() {
+    if (compassMode === "distance") return distanceTitle;
+    if (compassMode === "article") return articleTitle;
+    return globalCategoryTitle;
+}
 
 function setPreview(option) {
     if (!option) {
@@ -61,7 +72,10 @@ function resetLock(options) {
     hoverStartTime = null;
 
     setPreview(null);
-    setGlobalCompassTitle("");
+
+    if (compassMode === "category" || compassMode === "article") {
+        setGlobalCompassTitle("");
+    }
 
     if (options)
         options.forEach((option) => placeDot(option));
@@ -200,24 +214,138 @@ function placeDot(option) {
     dot.style.display = "block";
     dot.style.left = `${x}px`;
     dot.style.top = `${y}px`;
+    setDotBackgroundFromScreenPosition(dot);
+}
+
+function setDotBackgroundFromScreenPosition(dot) {
+    const rect = dot.getBoundingClientRect();
+    const y = rect.top + rect.height / 2;
+    const screenHeight = window.innerHeight;
+
+    const progress = Math.min(Math.max(y / screenHeight, 0), 1);
+
+    const color = getCompassGradientColor(progress);
+
+    dot.style.setProperty("--dot-bg", color);
+}
+
+function getCompassGradientColor(progress) {
+    const stops = [
+        { position: 0, color: [102, 48, 36] },
+        { position: 0.399, color: [138, 160, 221] },
+        { position: 0.9327, color: [255, 255, 255] }
+    ];
+
+    let start = stops[0];
+    let end = stops[stops.length - 1];
+
+    for (let i = 0; i < stops.length - 1; i++) {
+        if (progress >= stops[i].position && progress <= stops[i + 1].position) {
+            start = stops[i];
+            end = stops[i + 1];
+            break;
+        }
+    }
+
+    const localProgress =
+        (progress - start.position) / (end.position - start.position);
+
+    const r = Math.round(start.color[0] + (end.color[0] - start.color[0]) * localProgress);
+    const g = Math.round(start.color[1] + (end.color[1] - start.color[1]) * localProgress);
+    const b = Math.round(start.color[2] + (end.color[2] - start.color[2]) * localProgress);
+
+    return `rgb(${r}, ${g}, ${b})`;
 }
 
 function stopConfirmationWalk() {
     meterDisplay.style.display = "none";
+    meterDisplay.innerHTML = `<span id="compassMeters">5</span>m`;
+
+    compass.classList.remove("is-walking-to-article");
+    compass.classList.remove("is-arriving-at-article");
+
+    document.body.classList.remove("is-walking-to-article");
+
+    compass.style.removeProperty("--article-bg-progress");
+
+    articleWalkInProgress = false;
+
     stopWalk();
 }
 
 
 function startConfirmationWalk(option) {
-    meterDisplay.style.display = "block";
-    function onChange(walked) {
-        meters.textContent = 5 - Math.round(walked);
+    meterDisplay.style.display = "none";
+
+    const confirmationMeters = meterDisplay.querySelector("#compassMeters");
+
+    function onChange(walked, progress) {
+        if (confirmationMeters) {
+            confirmationMeters.textContent = progress;
+        }
     }
 
-    startWalk(0, onChange, () => finishCallback(lockedOption.value));
+    startWalk(5, onChange, () => {
+        setGlobalCompassTitle(option.title);
+
+        if (compassMode === "article" && option.value !== "back-to-categories") {
+            startWalkToArticle(option);
+        } else {
+            finishCallback(option.value);
+        }
+    });
+}
+
+function startWalkToArticle(option) {
+    articleWalkInProgress = true;
+
+    compass.classList.add("is-walking-to-article");
+    document.body.classList.add("is-walking-to-article");
+
+    compass.style.setProperty("--article-split", "100%");
+
+    meterDisplay.style.display = "block";
+    meterDisplay.innerHTML = `
+        <span id="compassMeters">20</span>m
+        <p class="walk-to-article-label">to walk to the article</p>
+    `;
+
+    const walkMeters = meterDisplay.querySelector("#compassMeters");
+
+    function onChange(walked, remaining) {
+        walkMeters.textContent = remaining;
+
+        const progress = Math.min(walked / 20, 1);
+        const split = 100 - progress * 100;
+
+        compass.style.setProperty("--article-split", `${split}%`);
+
+        if (walked >= 19.9) {
+            compass.classList.add("is-arriving-at-article");
+        }
+    }
+
+    startWalk(20, onChange, () => {
+        compass.classList.add("is-arriving-at-article");
+
+        setTimeout(() => {
+            compass.classList.remove("is-walking-to-article");
+            compass.classList.remove("is-arriving-at-article");
+
+            document.body.classList.remove("is-walking-to-article");
+
+            compass.style.removeProperty("--article-split");
+
+            articleWalkInProgress = false;
+
+            finishCallback(option.value);
+        }, 500);
+    });
 }
 
 function update() {
+    if (articleWalkInProgress) return;
+
     if (!lockedOption) {
         options.forEach((option) => placeDot(option));
     }
@@ -238,17 +366,22 @@ function handleOrientation(event) {
 }
 
 function setGlobalCompassTitle(text = "") {
-    if (globalCategoryTitle) {
-        globalCategoryTitle.textContent = text;
+    const targetTitle = getCompassTitleElement();
+
+    if (targetTitle) {
+        targetTitle.textContent = text;
     }
 }
 
-function startCompass(newQuestion, newOptions, newFinishCallback) {
+function startCompass(newQuestion, newOptions, newFinishCallback, newCompassMode = "default") {
+    compassMode = newCompassMode;
+
     meterDisplay.style.display = "none";
     window.addEventListener("deviceorientation", handleOrientation, true);
     question.textContent = newQuestion;
     options = newOptions;
     resetLock(options);
+
     finishCallback = (value) => {
         window.removeEventListener("deviceorientation", handleOrientation, true);
         newFinishCallback(value);
