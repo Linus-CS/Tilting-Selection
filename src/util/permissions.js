@@ -2,9 +2,10 @@ document.body.insertAdjacentHTML("afterbegin", `
 <div id="permissionOverlay" class="overlay is-visible">
     <div class="overlay-card">
         <p>
-            Footnotes is a digital reader that you navigate by walking.
-            To continue, this website needs access to your location,
-            orientation and motion sensors.
+            Welcome to Footnotes!
+        </p>
+        <p class="">
+            Please allow access to your location, orientation and motion sensors to use this website
         </p>
         <button id="permissionButton">Allow Access</button>
         <p id="permissionStatus" class="status-text"></p>

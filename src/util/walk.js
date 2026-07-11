@@ -11,7 +11,10 @@ const trackingOptions = {
     timeout: 10000
 }
 
+const MAX_ACCURACY_METERS = 7;
+
 function trackPosition(position) {
+    if (position.coords.accuracy > MAX_ACCURACY_METERS) return;
     if (lastPos === null) {
         lastPos = { lat: position.coords.latitude, lon: position.coords.longitude };
         return;
