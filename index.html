@@ -15,6 +15,7 @@
     <script src="src/util/log.js"></script>
     <script src="src/util/walk.js"></script>
     <script src="src/util/screen.js"></script>
+    <script src="src/util/animation.js"></script>
     <script defer src="src/util/permissions.js"></script>
     <script defer src="/src/util/cursor-compass.js"></script>
     <script defer src="src/util/compass.js"></script>
@@ -88,22 +89,10 @@
             </div>
 
             <div class="headline-path">
-                <svg viewBox="0 0 515 168" xmlns="http://www.w3.org/2000/svg">
-                    <path id="headline-path"
+                <svg viewBox="0 0 515 168" id="headline-svg">
+                    <path
                         d="M1.0175 5.62769C0.960286 5.62769 1.01327 9.92407 1.64055 18.1275C2.20913 25.5633 6.54753 32.333 11.6911 39.0877C17.07 46.1514 24.2014 50.7204 30.3567 54.01C35.9842 57.0175 42.8067 57.3004 50.1516 57.733C54.0788 57.9642 58.4346 57.6808 63.2063 56.9915C67.9779 56.3022 73.0392 55.0779 87.9861 47.4204C102.933 39.7629 127.612 25.7092 143.019 17.3709C158.425 9.03263 163.81 6.83564 169.842 5.1443C175.874 3.45296 182.389 2.33385 189.393 1.64669C196.397 0.959526 203.692 0.738228 211.026 1.38741C218.359 2.03659 225.51 3.56296 241.421 10.1051C257.332 16.6473 281.788 28.159 298.018 36.5307"
                         fill="none" stroke="none" />
-
-                    <text class="headline-text headline-stroke">
-                        <textPath href="#headline-path" startOffset="-80%">
-                            Go outside and start walking
-                        </textPath>
-                    </text>
-
-                    <text class="headline-text headline-fill">
-                        <textPath href="#headline-path" startOffset="-80%">
-                            Go outside and start walking
-                        </textPath>
-                    </text>
                 </svg>
             </div>
         </section>

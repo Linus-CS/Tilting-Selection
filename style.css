@@ -51,7 +51,7 @@ body,
     overflow: visible;
 }
 
-.headline-text {
+.animation-text {
     font-family: "powell", sans-serif;
     font-size: 25px;
     font-style: normal;
@@ -60,14 +60,14 @@ body,
     margin: 0;
 }
 
-.headline-stroke {
+.animation-text-stroke {
     fill: none;
     stroke: #fff;
     stroke-width: 10px;
     stroke-linejoin: round;
 }
 
-.headline-fill {
+.animation-text-fill {
     fill: #663024;
     stroke: none;
 }
